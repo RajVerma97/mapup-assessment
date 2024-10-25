@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-    <!-- Add this line -->
   </head>
   <body>
     <h1>We are done</h1>
 
-    <!-- Placeholder for user email -->
     <p id="userEmail"></p>
 
     <a href="/api/login">login</a>
@@ -37,7 +35,7 @@
         }
       }
 
-      // Fetch user information on page load
+    
       window.onload = () => {
         displayUserEmail(); // Display email based on the token
       };

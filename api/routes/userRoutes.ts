@@ -1,6 +1,5 @@
 import express from 'express';
 import multer from 'multer';
-import { authorize } from '../middleware/auth';
 const router = express.Router();
 const upload = multer();
 
@@ -28,8 +27,4 @@ router.get('/login', (req, res) => {
 
 router.post('/login', upload.none(), loginUser);
 
-router.get('/protected', authorize, (req, res) => {
-  console.log('from the protected route');
-  console.log(req.user);
-});
 export default router;

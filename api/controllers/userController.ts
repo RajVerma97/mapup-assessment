@@ -9,7 +9,7 @@ export const registerUser = async (req: Request, res: Response) => {
   const dbUser = await User.findOne({ email });
 
   if (dbUser) {
-    return res.status(400).send('User already exists');
+    return res.status(400).json({ message: 'User already exists' });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,10 +23,12 @@ export const registerUser = async (req: Request, res: Response) => {
 
   try {
     await newUser.save();
-    res.status(201).send(' Success register users');
+    res.status(200).json({ message: 'User created successfully' });
   } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+    return res.status(500).json({
+      message: 'An error occurred while registering the user',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 };
 
@@ -36,7 +38,7 @@ export const loginUser = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).send('Invalid credentials');
+      return res.status(401).json({ message: 'User not found' });
     }
     console.log('login');
 
@@ -44,7 +46,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).send('Invalid credentials');
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const token = jwt.sign(
@@ -55,8 +57,12 @@ export const loginUser = async (req: Request, res: Response) => {
       }
     );
 
-    res.status(200).json({ token });
+    const { password: _, ...userData } = user.toObject();
+    res.status(200).json({ token, user: userData });
   } catch (error) {
-    res.status(500).send('Server error');
+    return res.status(500).json({
+      message: 'An error occurred while registering the user',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 };
