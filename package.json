@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "node app.ts",
+    "dev": "nodemon --exec ts-node app.ts",
     "live": "live-server public",
     "lint": "eslint .",
     "lint:fix": "eslint .  --fix .",
@@ -16,15 +16,26 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.3",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1"
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.2",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^1.4.12",
     "eslint": "^9.13.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.11.0",
-    "live-server": "^1.2.2"
+    "live-server": "^1.2.2",
+    "ts-node": "^10.9.2"
   }
 }

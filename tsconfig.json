@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "lib": ["es2016", "dom"], // Added 'dom' for browser types if needed
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist", // Output directory for compiled files
+    "rootDir": "/", // Directory for your source files
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": ["*.ts", "api/**/*.ts"],
+  "exclude": [
+    "node_modules", // Exclude the node_modules directory
+    "**/*.spec.ts" // Exclude test files if any
+  ]
+}

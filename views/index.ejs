@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <!-- Add this line -->
+  </head>
+  <body>
+    <h1>We are done</h1>
+
+    <!-- Placeholder for user email -->
+    <p id="userEmail"></p>
+
+    <a href="/api/login">login</a>
+    <br />
+
+    <button onclick="handleLogout()">logout</button>
+    <a href="/api/register">Register</a>
+
+    <script>
+      function logout() {
+        localStorage.removeItem('token');
+        window.location.href = '/';
+      }
+
+      function displayUserEmail() {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const decoded = jwt_decode(token);
+          document.getElementById('userEmail').textContent =
+            `Logged in as: ${decoded.email}`;
+        } else {
+          document.getElementById('userEmail').textContent =
+            'No user logged in';
+        }
+      }
+
+      // Fetch user information on page load
+      window.onload = () => {
+        displayUserEmail(); // Display email based on the token
+      };
+
+      function handleLogout() {
+        logout();
+      }
+    </script>
+  </body>
+</html>

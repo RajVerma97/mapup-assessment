@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Login Form</h1>
+
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" required />
+
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" required />
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      document.getElementById('loginForm').addEventListener('submit', login);
+
+      async function login(event) {
+        event.preventDefault();
+        const form = document.getElementById('loginForm');
+        const formData = new FormData(form);
+
+        const data = {
+          email: formData.get('email'),
+          password: formData.get('password'),
+        };
+
+        try {
+          const response = await fetch('/api/login', {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            const token = result.token;
+
+            localStorage.setItem('token', token);
+            alert('Login Successful');
+
+            // Access the protected resource
+            accessProtectedResource(token);
+          } else {
+            const message = await response.text();
+            alert(`Login failed: ${message}`);
+          }
+        } catch (error) {
+          console.error('Error during login:', error);
+        }
+      }
+
+      async function accessProtectedResource(token) {
+        try {
+          window.location.href = '/api/protected';
+        } catch (error) {
+          console.error('Error accessing protected route:', error);
+        }
+      }
+    </script>
+  </body>
+</html>
