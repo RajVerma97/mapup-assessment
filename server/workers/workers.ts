@@ -4,6 +4,7 @@ import fs from 'fs';
 import { Job } from 'bullmq';
 import redisConnection from '../queues/redis';
 import WeatherData from '../api/models/weather';
+import { json } from 'body-parser';
 
 const worker = new Worker(
   'csv-processing',
@@ -11,8 +12,6 @@ const worker = new Worker(
     const { filePath } = job.data;
 
     const results: any[] = [];
-    let weatherMetadata: any = {};
-    let readingStarted = false;
 
     fs.createReadStream(filePath)
       .pipe(csvParser())
@@ -22,39 +21,28 @@ const worker = new Worker(
       .on('end', async () => {
         try {
           for (const item of results) {
-            // console.log(item);
-
             console.log(item.hourly);
-            
-            // const hourlyData =
-            //   typeof item.hourly === 'string'
-            //     ? JSON.parse(item.hourly)
-            //     : item.hourly;
 
-            // console.log(hourlyData);
-            // console.log(hourlyData.time);
-            // console.log(hourlyData.temperature_2m);
+            //the json string is stringified twice, so we need to parse it twice
+            const hourlyDataString = JSON.parse(item.hourly);
+            const hourly = JSON.parse(hourlyDataString);
 
-            // // Create weather data object with proper validation
-            // const weatherData = {
-            //   latitude: item.latitude,
-            //   longitude: item.longitude,
-            //   elevation: item.elevation,
-            //   utc_offset_seconds: item.utc_offset_seconds,
-            //   timezone: item.timezone,
-            //   timezone_abbreviation: item.timezone_abbreviation,
-            //   generationtime_ms: item.generationtime_ms,
-            //   hourly_units: {
-            //     time: item.hourly_units?.time || 'iso8601',
-            //     temperature_2m: item.hourly_units?.temperature_2m || '°C',
-            //   },
-            //   hourly: {
-            //     time: hourlyData.time || [],
-            //     temperature_2m: hourlyData.temperature_2m || [],
-            //   },
-            // };
-            // await weatherData.save();
-            // console.log('CSV processed and data stored in MongoDB.');
+            const weatherData = new WeatherData({
+              latitude: item.latitude,
+              longitude: item.longitude,
+              elevation: item.elevation,
+              utc_offset_seconds: item.utc_offset_seconds,
+              timezone: item.timezone,
+              timezone_abbreviation: item.timezone_abbreviation,
+              generationtime_ms: item.generationtime_ms,
+              hourly_units: {
+                time: item.hourly_units?.time || 'iso8601',
+                temperature_2m: item.hourly_units?.temperature_2m || '°C',
+              },
+              hourly,
+            });
+            await weatherData.save();
+            console.log('CSV processed and data stored in MongoDB.');
           }
         } catch (error: unknown) {
           if (error instanceof Error) {

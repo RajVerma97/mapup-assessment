@@ -12,10 +12,15 @@ import bodyParser from 'body-parser';
 import { csvQueue, serverAdapter } from './queues/queue';
 import './workers/workers';
 import multer from 'multer';
+import http from 'http';
+import { setupSocketIO } from './socket-io';
+import WeatherData from './api/models/weather';
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+setupSocketIO(server);
 
 const port = 5001;
 
@@ -26,7 +31,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true,
+  })
+);
 
 app.use('/api', userRoutes);
 
@@ -48,9 +59,18 @@ app.get('/protected', verifyToken, (req: Request, res: Response) => {
 app.post('/upload', upload.single('file'), (req: Request, res: Response) => {
   const filePath = req.file!.path;
 
-  csvQueue.add('csv-job', { filePath });
+  try {
+    csvQueue.add('csv-job', { filePath });
+    res.status(200).json({ message: 'File uploaded successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error uploading file' });
+  }
+});
 
-  res.status(200).send('File uploaded and processing started.');
+app.get('/data', verifyToken, async (req: Request, res: Response) => {
+  const data = await WeatherData.find().limit(5);
+  console.log(data);
+  res.status(200).json({ data, message: 'Data fetched successfully' });
 });
 
 app.use('/admin/queues', serverAdapter.getRouter());
