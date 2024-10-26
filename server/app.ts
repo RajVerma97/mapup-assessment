@@ -9,6 +9,9 @@ import connectDb from './db';
 import verifyToken from './api/middleware/auth';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { csvQueue, serverAdapter } from './queues/queue';
+import './workers/workers';
+import multer from 'multer';
 
 dotenv.config();
 
@@ -29,6 +32,8 @@ app.use('/api', userRoutes);
 
 const MONGODBURI = process.env.MONGODB_URI;
 
+const upload = multer({ dest: 'uploads/' });
+
 app.get('/', (req: Request, res: Response) => {
   console.log('from the index');
   console.log(req.user);
@@ -39,6 +44,16 @@ app.get('/protected', verifyToken, (req: Request, res: Response) => {
   console.log('procted route');
   res.status(200).json({ message: 'Protected route Accessed  Successfully' });
 });
+
+app.post('/upload', upload.single('file'), (req: Request, res: Response) => {
+  const filePath = req.file!.path;
+
+  csvQueue.add('csv-job', { filePath });
+
+  res.status(200).send('File uploaded and processing started.');
+});
+
+app.use('/admin/queues', serverAdapter.getRouter());
 
 connectDb();
 

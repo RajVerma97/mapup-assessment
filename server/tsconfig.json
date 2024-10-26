@@ -11,7 +11,7 @@
     "rootDir": "/", // Directory for your source files
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["*.ts", "api/**/*.ts"],
+  "include": ["*.ts", "api/**/*.ts", "workers/workers.ts"],
   "exclude": [
     "node_modules", // Exclude the node_modules directory
     "**/*.spec.ts" // Exclude test files if any
