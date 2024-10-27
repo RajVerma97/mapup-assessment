@@ -81,11 +81,11 @@ export default function Register({ setPath }: RegisterProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-400 text-black">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        <h1 className="text-center text-black text-3xl font-bold mb-6">
+      <div className="bg-white  shadow-lg rounded-lg p-16 max-w-2xl  w-full">
+        <h1 className="text-center text-black text-3xl font-bold mb-8">
           Register
         </h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
           <label htmlFor="email" className="font-medium">
             Email
           </label>
@@ -142,7 +142,7 @@ export default function Register({ setPath }: RegisterProps) {
 
           <button
             type="submit"
-            className="bg-black   text-white rounded-lg p-2 hover:bg-blue-600 transition duration-200 mt-6"
+            className="bg-black col-span-2 h-full   text-white rounded-lg  hover:bg-blue-600 transition duration-200 mt-6"
           >
             Submit
           </button>

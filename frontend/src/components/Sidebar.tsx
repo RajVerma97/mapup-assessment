@@ -88,7 +88,7 @@ export default function Sidebar({ className, setPath }: SidebarProps) {
     : userProfileTypeImages.DEFAULT;
 
   return (
-    <div className={`w-full h-full ${className} p-8`}>
+    <div className={`w-full h-full ${className} p-8 bg-white `}>
       <div>
         <div className="w-full flex flex-col justify-center gap-4 items-center border-blue-500 p-2">
           <Image

@@ -23,5 +23,5 @@ export default function MainContent({
         return <Login setPath={setPath} />;
     }
   }, [path, setPath]);
-  return <div className={` w-full h-ful ${className}`}>{content}</div>;
+  return <div className={` ${className}  `}>{content}</div>;
 }
