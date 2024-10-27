@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 
 enum AlertCategory {
   SUCCESS = "SUCCESS",
@@ -13,15 +12,16 @@ interface AlertMessage {
   category: AlertCategory;
 }
 
-export default function Login() {
+interface LoginProps {
+  setPath: React.Dispatch<React.SetStateAction<string>>;
+}
+export default function Login({ setPath }: LoginProps) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
   const [message, setMessage] = useState<AlertMessage>();
 
   const Backend = process.env.NEXT_PUBLIC_BACKEND;
-
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,35 +36,22 @@ export default function Login() {
           "Content-Type": "application/json",
         },
       });
-      console.log("response from login");
-      console.log(response);
       if (response.status === 200) {
         setMessage({
           text: "Successfully Logged In",
           category: AlertCategory.SUCCESS,
         });
         localStorage.setItem("token", response.data.token);
-        console.log("saved to local", localStorage.getItem("token"));
-        localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user info
-
-        router.push("/");
-
-        // const protectedResponse = await axios.get(`${Backend}/protected`, {
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-        //   },
-        // });
-        // console.log(protectedResponse);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
 
         setEmail("");
         setPassword("");
+        setPath("/dashboard");
       } else {
         setMessage({
           text: "Failed to login",
           category: AlertCategory.ERROR,
         });
-        console.log("here");
       }
     } catch (error) {
       const errorMessage =
@@ -83,43 +70,49 @@ export default function Login() {
   };
 
   return (
-    <div className="p-16">
-      <h1 className="text-center text-2xl font-bold">Login</h1>
-      <div className="p-5 flex justify-center items-center">
-        <form
-          onSubmit={handleSubmit}
-          action="/api/login"
-          method="POST"
-          className="flex flex-col max-w-md gap-4"
-        >
-          <label htmlFor="email">Email</label>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-500 text-black">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h1 className="text-center text-3xl font-bold mb-6">Login</h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label htmlFor="email" className="font-medium">
+            Email
+          </label>
           <input
             type="email"
             name="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="text-black"
+            className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
           />
 
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password" className="font-medium">
+            Password
+          </label>
           <input
             type="password"
             name="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="text-black"
+            className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
           />
 
-          <button type="submit">Submit</button>
+          <button
+            type="submit"
+            className="bg-black text-white rounded-lg p-2 hover:bg-green-600 transition duration-200"
+          >
+            Submit
+          </button>
 
           {message && (
-            <div>
+            <div className="mt-4">
               {message.category === AlertCategory.SUCCESS ? (
-                <p className="text-green-500">Success: {message.text}</p>
+                <p className="text-green-500">{message.text}</p>
               ) : (
-                <p className="text-red-500">Error: {message.text}</p>
+                <p className="text-red-500">{message.text}</p>
               )}
             </div>
           )}

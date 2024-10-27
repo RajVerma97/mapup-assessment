@@ -1,5 +1,6 @@
-import SocketProvider from "@/utils/SocketContext";
 import "./globals.css";
+import { AxiosProvider } from "./hooks/use-axios-context";
+import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper";
 
 export default function RootLayout({
   children,
@@ -8,9 +9,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <SocketProvider>{children}</SocketProvider>
-      </body>
+      <QueryClientProviderWrapper>
+        <AxiosProvider>
+          <body>{children}</body>
+        </AxiosProvider>
+      </QueryClientProviderWrapper>
     </html>
   );
 }

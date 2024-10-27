@@ -19,8 +19,8 @@ import WeatherData from './api/models/weather';
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-setupSocketIO(server);
+// const server = http.createServer(app);
+// setupSocketIO(server);
 
 const port = 5001;
 
@@ -68,8 +68,16 @@ app.post('/upload', upload.single('file'), (req: Request, res: Response) => {
 });
 
 app.get('/data', verifyToken, async (req: Request, res: Response) => {
-  const data = await WeatherData.find().limit(5);
-  console.log(data);
+  const { page = 1, limit = 5, sort = 'desc', filter = '' } = req.query;
+
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+
+  const data = await WeatherData.find()
+    .skip((pageNum - 1) * limitNum)
+    .limit(parseInt(limit as string))
+    .sort({ date: sort });
+
   res.status(200).json({ data, message: 'Data fetched successfully' });
 });
 
