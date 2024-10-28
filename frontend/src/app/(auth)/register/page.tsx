@@ -28,9 +28,10 @@ export default function Register({ setPath }: RegisterProps) {
         message: data?.message || "User Registered Successfully",
         status: "success",
       });
+
       setTimeout(() => {
-        setPath("/dashboard");
-      }, 3000);
+        window.location.reload();
+      }, 2000);
     },
     onError: (error: AxiosError<ErrorResponse>) => {
       const errorMessage = error?.response?.data?.message;

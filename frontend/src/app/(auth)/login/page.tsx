@@ -11,7 +11,6 @@ interface LoginProps {
   setPath: React.Dispatch<React.SetStateAction<string>>;
 }
 
-
 export default function Login({ setPath }: LoginProps) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -27,8 +26,8 @@ export default function Login({ setPath }: LoginProps) {
         status: "success",
       });
       setTimeout(() => {
-        setPath("/dashboard");
-      }, 3000);
+        window.location.reload();
+      }, 2000);
     },
     onError: (error: AxiosError<ErrorResponse>) => {
       const errorMessage = error?.response?.data?.message;

@@ -10,8 +10,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-interface WeatherData {
-  timestamp: string;
+export interface WeatherChartData {
+  time: string;
   temperature: number;
   humidity: number;
   pressure: number;

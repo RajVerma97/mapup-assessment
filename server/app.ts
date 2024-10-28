@@ -92,18 +92,18 @@ export const getRandomRevenueData = () => {
   });
 };
 
-io.on('connection', (socket) => {
-  const job = new CronJob('*/5 * * * * *', async () => {
-    const data = await WeatherData.find();
-    socket.emit('weather', data);
-  });
+// io.on('connection', (socket) => {
+//   const job = new CronJob('*/5 * * * * *', async () => {
+//     const data = await WeatherData.find();
+//     socket.emit('weather', data);
+//   });
 
-  job.start();
+//   job.start();
 
-  socket.on('disconnect', () => {
-    job.stop();
-  });
-});
+//   socket.on('disconnect', () => {
+//     job.stop();
+//   });
+// });
 
 app.use('/user', userRoutes);
 
@@ -134,6 +134,7 @@ app.post('/upload', upload.single('file'), (req: Request, res: Response) => {
 });
 
 app.get('/data', verifyToken, async (req: Request, res: Response) => {
+  console.log('dhsldf');
   const { page = 1, limit = 5, sort = 'desc', filter = '' } = req.query;
 
   const pageNum = Number(page);

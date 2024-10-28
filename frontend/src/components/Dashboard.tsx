@@ -1,6 +1,6 @@
 import { BarChart2, Droplet, Thermometer, Upload, Wind } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import WeatherChart from "./WeatherChart";
+import WeatherChart, { WeatherChartData } from "./WeatherChart";
 import MonthlyAverageTemperatureChart from "./MonthlyTemperatureChart";
 import AvgHumidityChart from "./AvgHumidityChart";
 import WindSpeedCategoriesChart from "./WindSpeedCategoriesChart";
@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import useFileUploadMutation from "@/app/hooks/use-file-upload";
 import { ToastManager } from "./ToastManager";
 import { socket } from "@/socket-io";
+import useFetchWeatherData from "@/app/hooks/use-fetch-weather-data";
 
 interface MetricCardProps {
   title: string;
@@ -109,24 +110,31 @@ export default function Dashboard() {
     }
   };
 
-  const [, setData] = useState([]);
+  const { data } = useFetchWeatherData({
+    page: 1,
+    limit: 20,
+    sort: "desc",
+    filter: "",
+  });
 
-  useEffect(() => {
-    let previousData = [];
+  // const [, setData] = useState([]);
 
-    const handleSocketData = (serverData) => {
-      if (previousData.length > 0) {
-      }
-      setData(serverData);
-      previousData = serverData;
-    };
+  // useEffect(() => {
+  //   let previousData = [];
 
-    socket.on("weather", handleSocketData);
+  //   const handleSocketData = (serverData) => {
+  //     if (previousData.length > 0) {
+  //     }
+  //     setData(serverData);
+  //     previousData = serverData;
+  //   };
 
-    return () => {
-      socket.off("weather", handleSocketData);
-    };
-  }, []);
+  //   socket.on("weather", handleSocketData);
+
+  //   return () => {
+  //     socket.off("weather", handleSocketData);
+  //   };
+  // }, []);
 
   return (
     <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
