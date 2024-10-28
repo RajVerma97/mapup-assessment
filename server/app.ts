@@ -39,7 +39,7 @@ app.use(
   })
 );
 
-app.use('/api', userRoutes);
+app.use('/user', userRoutes);
 
 const MONGODBURI = process.env.MONGODB_URI;
 

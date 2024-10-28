@@ -6,7 +6,7 @@ interface UseAuthenticatedMutationOptions<TData, TSuccess, TError> {
   onError?: (error: TError) => void;
 }
 
-const useAuthenticatedMutation = <TData, TSuccess, TError = any>(
+const useAuthenticatedMutation = <TData, TSuccess, TError = unknown>(
   options: UseAuthenticatedMutationOptions<TData, TSuccess, TError>
 ): UseMutationResult<TSuccess, TError, TData> => {
   const { mutationFn, onSuccess, onError } = options;

@@ -5,6 +5,8 @@ import MonthlyAverageTemperatureChart from "./MonthlyTemperatureChart";
 import AvgHumidityChart from "./AvgHumidityChart";
 import WindSpeedCategoriesChart from "./WindSpeedCategoriesChart";
 import { motion } from "framer-motion";
+import useFileUploadMutation from "@/app/hooks/use-file-upload";
+import { ToastManager } from "./ToastManager";
 
 interface MetricCardProps {
   title: string;
@@ -30,7 +32,7 @@ const MetricCard = ({
         className="p-3 rounded-lg bg-opacity-10"
         style={{ backgroundColor: `${color}20` }}
       >
-        {icon} {/* Render the icon directly */}
+        {icon}
       </div>
       <div>
         <p className="text-sm text-gray-600">{title}</p>
@@ -39,10 +41,6 @@ const MetricCard = ({
     </div>
   </motion.div>
 );
-
-const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  e.preventDefault();
-};
 
 export default function Dashboard() {
   const weatherData = [
@@ -96,6 +94,19 @@ export default function Dashboard() {
       windSpeed: 6,
     },
   ];
+
+  const fileUploadMutation = useFileUploadMutation();
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      fileUploadMutation.mutate(formData);
+    }
+  };
   return (
     <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
       <div className="bg-white rounded-xl p-8 shadow-lg flex  justify-between items-center">
@@ -162,6 +173,7 @@ export default function Dashboard() {
         <AvgHumidityChart />
         {/* <WindSpeedHeatmap /> */}
       </div>
+      <ToastManager />
     </div>
   );
 }

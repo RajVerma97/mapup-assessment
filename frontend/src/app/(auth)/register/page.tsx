@@ -1,22 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
-
-enum AlertCategory {
-  SUCCESS = "SUCCESS",
-  ERROR = "ERROR",
-}
-interface AlertMessage {
-  text: string;
-  category: AlertCategory;
-}
-
-enum UserRole {
-  ADMIN = "ADMIN",
-  USER = "USER",
-  MANAGER = "MANAGER",
-}
+import useRegisterUserMutation from "@/app/hooks/use-register-user-mutation";
+import { notify, ToastManager } from "@/components/ToastManager";
+import { UserRole } from "@/enums/UserRole";
+import { RegisterAuthResponse, RegisterUserData } from "@/types/register-user";
+import { AxiosError } from "axios";
+import { ErrorResponse } from "@/types/error-response";
 
 interface RegisterProps {
   setPath: React.Dispatch<React.SetStateAction<string>>;
@@ -27,56 +17,40 @@ export default function Register({ setPath }: RegisterProps) {
   const [userName, setUserName] = useState<string>("");
   const [role, setRole] = useState<UserRole>(UserRole.USER);
 
-  const [message, setMessage] = useState<AlertMessage>();
+  const registerMutation = useRegisterUserMutation({
+    onSuccess: (data: RegisterAuthResponse) => {
+      setEmail("");
+      setPassword("");
+      setUserName("");
+      setRole(UserRole.USER);
 
-  const Backend = process.env.NEXT_PUBLIC_BACKEND;
+      notify({
+        message: data?.message || "User Registered Successfully",
+        status: "success",
+      });
+      setTimeout(() => {
+        setPath("/dashboard");
+      }, 3000);
+    },
+    onError: (error: AxiosError<ErrorResponse>) => {
+      const errorMessage = error?.response?.data?.message;
+      notify({
+        message: errorMessage || "Something went wrong",
+        status: "error",
+      });
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = {
+    const data: RegisterUserData = {
       email: email,
       password: password,
       username: userName,
       role: role,
     };
 
-    try {
-      const response = await axios.post(`${Backend}/api/register`, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === 200) {
-        setMessage({
-          text: "Successfully registered",
-          category: AlertCategory.SUCCESS,
-        });
-        setEmail("");
-        setPassword("");
-        setUserName("");
-        setRole(UserRole.USER);
-
-        setPath("/dashboard");
-      } else {
-        setMessage({
-          text: "Failed to register",
-          category: AlertCategory.ERROR,
-        });
-      }
-    } catch (error) {
-      const errorMessage =
-        axios.isAxiosError(error) && error.response
-          ? error.response.data.message || "Failed to register"
-          : "Network error, please try again";
-
-      setMessage({
-        text:
-          typeof errorMessage === "string"
-            ? errorMessage
-            : JSON.stringify(errorMessage),
-        category: AlertCategory.ERROR,
-      });
-    }
+    registerMutation.mutate(data);
   };
 
   return (
@@ -146,17 +120,8 @@ export default function Register({ setPath }: RegisterProps) {
           >
             Submit
           </button>
-
-          {message && (
-            <div className="mt-4">
-              {message.category === AlertCategory.SUCCESS ? (
-                <p className="text-green-500">{message.text}</p>
-              ) : (
-                <p className="text-red-500">{message.text}</p>
-              )}
-            </div>
-          )}
         </form>
+        <ToastManager />
       </div>
     </div>
   );

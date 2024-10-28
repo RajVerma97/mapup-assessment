@@ -1,6 +1,5 @@
 "use client";
 
-// import { getUser, logout } from "@/utils/userUtils";
 import MainContent from "@/components/MainContent";
 import Sidebar from "@/components/Sidebar";
 import React from "react";

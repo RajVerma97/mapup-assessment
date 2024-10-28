@@ -1,72 +1,52 @@
 "use client";
 
+import useLoginUserMutation from "@/app/hooks/use-login-user-mutation";
+import { notify, ToastManager } from "@/components/ToastManager";
+import { ErrorResponse } from "@/types/error-response";
+import { LoginAuthResponse, LoginUserData } from "@/types/login-user";
+import { AxiosError } from "axios";
 import { useState } from "react";
-import axios from "axios";
-
-enum AlertCategory {
-  SUCCESS = "SUCCESS",
-  ERROR = "ERROR",
-}
-interface AlertMessage {
-  text: string;
-  category: AlertCategory;
-}
 
 interface LoginProps {
   setPath: React.Dispatch<React.SetStateAction<string>>;
 }
+
+
 export default function Login({ setPath }: LoginProps) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const [message, setMessage] = useState<AlertMessage>();
-
-  const Backend = process.env.NEXT_PUBLIC_BACKEND;
+  const loginMutation = useLoginUserMutation({
+    onSuccess: (data: LoginAuthResponse) => {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setEmail("");
+      setPassword("");
+      notify({
+        message: data.message,
+        status: "success",
+      });
+      setTimeout(() => {
+        setPath("/dashboard");
+      }, 3000);
+    },
+    onError: (error: AxiosError<ErrorResponse>) => {
+      const errorMessage = error?.response?.data?.message;
+      notify({
+        message: errorMessage || "Something went wrong",
+        status: "error",
+      });
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = {
+    const data: LoginUserData = {
       email: email,
       password: password,
     };
 
-    try {
-      const response = await axios.post(`${Backend}/api/login`, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === 200) {
-        setMessage({
-          text: "Successfully Logged In",
-          category: AlertCategory.SUCCESS,
-        });
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-
-        setEmail("");
-        setPassword("");
-        setPath("/dashboard");
-      } else {
-        setMessage({
-          text: "Failed to login",
-          category: AlertCategory.ERROR,
-        });
-      }
-    } catch (error) {
-      const errorMessage =
-        axios.isAxiosError(error) && error.response
-          ? error.response.data.message || "Failed to login"
-          : "Network error, please try again";
-
-      setMessage({
-        text:
-          typeof errorMessage === "string"
-            ? errorMessage
-            : JSON.stringify(errorMessage),
-        category: AlertCategory.ERROR,
-      });
-    }
+    loginMutation.mutate(data);
   };
 
   return (
@@ -106,17 +86,8 @@ export default function Login({ setPath }: LoginProps) {
           >
             Submit
           </button>
-
-          {message && (
-            <div className="mt-4">
-              {message.category === AlertCategory.SUCCESS ? (
-                <p className="text-green-500">{message.text}</p>
-              ) : (
-                <p className="text-red-500">{message.text}</p>
-              )}
-            </div>
-          )}
         </form>
+        <ToastManager />
       </div>
     </div>
   );

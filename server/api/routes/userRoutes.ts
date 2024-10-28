@@ -19,7 +19,7 @@ declare global {
 router.get('/register', (req, res) => {
   res.render('register.ejs');
 });
-router.post('/register', upload.none(), registerUser);
+router.post('/register', registerUser);
 
 router.get('/login', (req, res) => {
   res.render('login.ejs');
