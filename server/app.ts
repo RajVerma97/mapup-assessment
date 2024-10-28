@@ -12,16 +12,16 @@ import bodyParser from 'body-parser';
 import { csvQueue, serverAdapter } from './queues/queue';
 import './workers/workers';
 import multer from 'multer';
-import http from 'http';
-import { setupSocketIO } from './socket-io';
 import WeatherData from './api/models/weather';
+import { Server } from 'socket.io';
+import { CronJob } from 'cron';
+import http from 'http';
+import { setupSocketIO } from './setup-socket';
 
 dotenv.config();
 
 const app = express();
-// const server = http.createServer(app);
-// setupSocketIO(server);
-
+const httpServer = http.createServer(app);
 const port = 5001;
 
 app.set('view engine', 'ejs');
@@ -31,13 +31,79 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
-app.use(
-  cors({
+app.use(cors());
+
+const io = new Server(httpServer, {
+  cors: {
     origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  })
-);
+  },
+  transports: ['websocket', 'polling'],
+});
+
+export const getRandomRevenueData = () => {
+  const random_data = [
+    {
+      name: 'BHR',
+      total_revenue: Math.floor(Math.random() * 10000),
+      loss: Math.floor(Math.random() * 10000),
+    },
+    {
+      name: 'RAD',
+      total_revenue: Math.floor(Math.random() * 10000),
+      loss: Math.floor(Math.random() * 10000),
+    },
+    {
+      name: 'FDS',
+      total_revenue: Math.floor(Math.random() * 10000),
+      loss: Math.floor(Math.random() * 10000),
+    },
+    {
+      name: 'AVF',
+      total_revenue: Math.floor(Math.random() * 10000),
+      loss: Math.floor(Math.random() * 10000),
+    },
+    {
+      name: 'RTY',
+      total_revenue: Math.floor(Math.random() * 10000),
+      loss: Math.floor(Math.random() * 10000),
+    },
+    {
+      name: 'VFV',
+      total_revenue: Math.floor(Math.random() * 10000),
+      loss: Math.floor(Math.random() * 10000),
+    },
+    {
+      name: 'GFL',
+      total_revenue: Math.floor(Math.random() * 10000),
+      loss: Math.floor(Math.random() * 1000),
+    },
+  ];
+
+  return new Promise((resolve, reject) => {
+    const revenueData = random_data?.map((item) => {
+      const profit = item?.total_revenue - item?.loss;
+      return { ...item, profit };
+    });
+    if (random_data) {
+      resolve(revenueData);
+    } else {
+      reject(new Error('Profit cannot be negative.'));
+    }
+  });
+};
+
+io.on('connection', (socket) => {
+  const job = new CronJob('*/5 * * * * *', async () => {
+    const data = await getRandomRevenueData();
+    socket.emit('weather', data);
+  });
+
+  job.start();
+
+  socket.on('disconnect', () => {
+    job.stop();
+  });
+});
 
 app.use('/user', userRoutes);
 
@@ -85,6 +151,6 @@ app.use('/admin/queues', serverAdapter.getRouter());
 
 connectDb();
 
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

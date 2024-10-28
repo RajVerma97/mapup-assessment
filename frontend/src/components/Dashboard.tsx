@@ -1,5 +1,5 @@
 import { BarChart2, Droplet, Thermometer, Upload, Wind } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import WeatherChart from "./WeatherChart";
 import MonthlyAverageTemperatureChart from "./MonthlyTemperatureChart";
 import AvgHumidityChart from "./AvgHumidityChart";
@@ -7,6 +7,7 @@ import WindSpeedCategoriesChart from "./WindSpeedCategoriesChart";
 import { motion } from "framer-motion";
 import useFileUploadMutation from "@/app/hooks/use-file-upload";
 import { ToastManager } from "./ToastManager";
+import { socket } from "@/socket-io";
 
 interface MetricCardProps {
   title: string;
@@ -107,6 +108,27 @@ export default function Dashboard() {
       fileUploadMutation.mutate(formData);
     }
   };
+
+  const [, setData] = useState([]);
+
+  useEffect(() => {
+    let previousData = [];
+
+    const handleSocketData = (serverData: any) => {
+      console.log(serverData);
+      if (previousData.length > 0) {
+      }
+      setData(serverData);
+      previousData = serverData;
+    };
+
+    socket.on("weather", handleSocketData);
+
+    return () => {
+      socket.off("weather", handleSocketData);
+    };
+  }, []);
+
   return (
     <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
       <div className="bg-white rounded-xl p-8 shadow-lg flex  justify-between items-center">
