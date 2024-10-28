@@ -2,7 +2,8 @@ import { HomeIcon, LogInIcon, LogOut, User } from "lucide-react";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getUser, logout } from "@/utils/userUtils";
+import { useUser } from "@/app/hooks/use-user";
+import { useLogout } from "@/app/hooks/use-logout";
 
 interface SidebarProps {
   className?: string;
@@ -16,10 +17,6 @@ interface SidebarLinkProps {
   children: React.ReactNode;
   onClick?: () => void;
 }
-
-const handleLogout = () => {
-  logout();
-};
 
 const SidebarLink = ({ name, path, children, onClick }: SidebarLinkProps) => (
   <Link
@@ -44,7 +41,12 @@ const SidebarLink = ({ name, path, children, onClick }: SidebarLinkProps) => (
 );
 
 export default function Sidebar({ className, setPath }: SidebarProps) {
-  const user = getUser();
+  const user = useUser();
+  const { logout } = useLogout();
+
+  const handleLogout = () => {
+    logout();
+  };
   const sideBarLinks = [
     {
       name: "Dashboard",

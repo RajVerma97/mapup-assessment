@@ -114,8 +114,7 @@ export default function Dashboard() {
   useEffect(() => {
     let previousData = [];
 
-    const handleSocketData = (serverData: any) => {
-      console.log(serverData);
+    const handleSocketData = (serverData) => {
       if (previousData.length > 0) {
       }
       setData(serverData);
