@@ -6,7 +6,7 @@ import redisConnection from '../queues/redis';
 import WeatherData from '../api/models/weather';
 import { json } from 'body-parser';
 
-let skipRows = 3;
+let skipRows = 4;
 
 const worker = new Worker(
   'csv-processing',
