@@ -1,6 +1,5 @@
 import { BarChart2, Droplet, Thermometer, Upload, Wind } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import WeatherChart, { WeatherChartData } from "./WeatherChart";
 import MonthlyAverageTemperatureChart from "./MonthlyTemperatureChart";
 import AvgHumidityChart from "./AvgHumidityChart";
 import WindSpeedCategoriesChart from "./WindSpeedCategoriesChart";
@@ -8,7 +7,16 @@ import { motion } from "framer-motion";
 import useFileUploadMutation from "@/app/hooks/use-file-upload";
 import { ToastManager } from "./ToastManager";
 import { socket } from "@/socket-io";
-import useFetchWeatherData from "@/app/hooks/use-fetch-weather-data";
+import { WeatherDataList } from "@/types/weather-data";
+import dayjs from "dayjs";
+
+export interface WeatherChartData {
+  time: string;
+  temperature: number;
+  humidity: number;
+  pressure: number;
+  windSpeed: number;
+}import useFetchWeatherData from "@/app/hooks/use-fetch-weather-data";
 
 interface MetricCardProps {
   title: string;
@@ -45,58 +53,6 @@ const MetricCard = ({
 );
 
 export default function Dashboard() {
-  const weatherData = [
-    {
-      timestamp: "Day 1",
-      temperature: 12,
-      humidity: 60,
-      pressure: 100,
-      windSpeed: 5,
-    },
-    {
-      timestamp: "Day 2",
-      temperature: 25,
-      humidity: 55,
-      pressure: 300,
-      windSpeed: 7,
-    },
-    {
-      timestamp: "Day 3",
-      temperature: 27,
-      humidity: 65,
-      pressure: 200,
-      windSpeed: 6,
-    },
-    {
-      timestamp: "Day 4",
-      temperature: 24,
-      humidity: 70,
-      pressure: 140,
-      windSpeed: 4,
-    },
-    {
-      timestamp: "Day 5",
-      temperature: 26,
-      humidity: 60,
-      pressure: 150,
-      windSpeed: 8,
-    },
-    {
-      timestamp: "Day 6",
-      temperature: 23,
-      humidity: 75,
-      pressure: 1013,
-      windSpeed: 5,
-    },
-    {
-      timestamp: "Day 7",
-      temperature: 28,
-      humidity: 58,
-      pressure: 140,
-      windSpeed: 6,
-    },
-  ];
-
   const fileUploadMutation = useFileUploadMutation();
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,17 +73,30 @@ export default function Dashboard() {
     filter: "",
   });
 
-  // const [, setData] = useState([]);
+  // const [data, setData] = useState<WeatherDataList>([]);
 
-  // useEffect(() => {
-  //   let previousData = [];
+  const WeatherChartData: WeatherChartData[] = data.map((item) => ({
+    time: dayjs(item.time).format("DD/MM/YYYY"),
+    temperature: parseFloat(item.temperature_2m),
+    humidity: parseFloat(item.dew_point_2m),
+    pressure: parseFloat((parseFloat(item.pressure_msl) / 50).toFixed(2)),
+    windSpeed: parseFloat(item.wind_speed_100m),
+  }));
 
-  //   const handleSocketData = (serverData) => {
-  //     if (previousData.length > 0) {
-  //     }
-  //     setData(serverData);
-  //     previousData = serverData;
-  //   };
+  console.log("weather data");
+
+  console.log(WeatherChartData);
+
+  useEffect(() => {
+    let previousData: WeatherDataList = [];
+
+    const handleSocketData = (serverData: WeatherDataList) => {
+      console.log(serverData);
+      if (previousData.length > 0) {
+      }
+      setData(serverData);
+      previousData = serverData;
+    };
 
   //   socket.on("weather", handleSocketData);
 
@@ -192,7 +161,7 @@ export default function Dashboard() {
       </div>
 
       <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
-        <WeatherChart weatherData={weatherData} />
+        {/* <WeatherChart weatherData={WeatherChartData} /> */}
       </div>
       <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
         <WindSpeedCategoriesChart />

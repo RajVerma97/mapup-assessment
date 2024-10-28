@@ -9,53 +9,47 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { WeatherChartData } from "./Dashboard";
 
-export interface WeatherChartData {
-  time: string;
-  temperature: number;
-  humidity: number;
-  pressure: number;
-  windSpeed: number;
-}
 interface WeatherChartProps {
-  weatherData: WeatherData[];
+  weatherData: WeatherChartData[];
 }
 
 const WeatherChart = ({ weatherData }: WeatherChartProps) => {
+  console.log(weatherData);
   const colorSchemes = {
     option1: {
-      temperature: "#ff6b6b", 
-      humidity: "#4dabf7", 
-      pressure: "#be4bdb", 
-      windSpeed: "#20c997", 
+      temperature: "#ff6b6b",
+      humidity: "#4dabf7",
+      pressure: "#be4bdb",
+      windSpeed: "#20c997",
     },
     option2: {
-      temperature: "#ff6b6b", 
-      humidity: "#4dabf7", 
-      pressure: "#f06595", 
-      windSpeed: "#20c997", 
+      temperature: "#ff6b6b",
+      humidity: "#4dabf7",
+      pressure: "#f06595",
+      windSpeed: "#20c997",
     },
     option3: {
-      temperature: "#ff6b6b", 
-      humidity: "#4dabf7", 
-      pressure: "#7950f2", 
-      windSpeed: "#20c997", 
+      temperature: "#ff6b6b",
+      humidity: "#4dabf7",
+      pressure: "#7950f2",
+      windSpeed: "#20c997",
     },
     option4: {
-      temperature: "#ff6b6b", 
-      humidity: "#4dabf7", 
-      pressure: "#e64980", 
-      windSpeed: "#20c997", 
+      temperature: "#ff6b6b",
+      humidity: "#4dabf7",
+      pressure: "#e64980",
+      windSpeed: "#20c997",
     },
     option5: {
-      temperature: "#ff6b6b", 
-      humidity: "#4dabf7", 
-      pressure: "#cc5de8", 
-      windSpeed: "#20c997", 
+      temperature: "#ff6b6b",
+      humidity: "#4dabf7",
+      pressure: "#cc5de8",
+      windSpeed: "#20c997",
     },
   };
 
-  
   const colors = colorSchemes.option4;
 
   const CustomTooltip = ({ active, payload, label }) => {
