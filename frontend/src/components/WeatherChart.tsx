@@ -16,36 +16,35 @@ interface WeatherChartProps {
 }
 
 const WeatherChart = ({ weatherData }: WeatherChartProps) => {
-  console.log(weatherData);
   const colorSchemes = {
     option1: {
       temperature: "#ff6b6b",
       humidity: "#4dabf7",
-      pressure: "#be4bdb",
+      soilTemperature: "#be4bdb",
       windSpeed: "#20c997",
     },
     option2: {
       temperature: "#ff6b6b",
       humidity: "#4dabf7",
-      pressure: "#f06595",
+      soilTemperature: "#f06595",
       windSpeed: "#20c997",
     },
     option3: {
       temperature: "#ff6b6b",
       humidity: "#4dabf7",
-      pressure: "#7950f2",
+      soilTemperature: "#7950f2",
       windSpeed: "#20c997",
     },
     option4: {
       temperature: "#ff6b6b",
       humidity: "#4dabf7",
-      pressure: "#e64980",
+      soilTemperature: "#e64980",
       windSpeed: "#20c997",
     },
     option5: {
       temperature: "#ff6b6b",
       humidity: "#4dabf7",
-      pressure: "#cc5de8",
+      soilTemperature: "#cc5de8",
       windSpeed: "#20c997",
     },
   };
@@ -67,7 +66,7 @@ const WeatherChart = ({ weatherData }: WeatherChartProps) => {
                 className="w-2 h-2 rounded-full"
                 style={{ backgroundColor: item.color }}
               ></span>
-              <span className="text-gray-600">{item.name}:</span>
+              <span className="text-gray-600 capitalize">{item.name}:</span>
               <span className="font-semibold">{item.value}</span>
             </p>
           ))}
@@ -90,7 +89,7 @@ const WeatherChart = ({ weatherData }: WeatherChartProps) => {
               className="w-3 h-3 rounded-full transition-transform group-hover:scale-125"
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-sm text-gray-700 font-medium group-hover:text-gray-900">
+            <span className="text-sm text-gray-700 capitalize font-medium group-hover:text-gray-900">
               {entry.value}
             </span>
           </div>
@@ -114,7 +113,7 @@ const WeatherChart = ({ weatherData }: WeatherChartProps) => {
             vertical={false}
           />
           <XAxis
-            dataKey="timestamp"
+            dataKey="time"
             tick={{ fill: "#495057", fontSize: 12 }}
             tickLine={{ stroke: "#dee2e6" }}
             axisLine={{ stroke: "#dee2e6" }}
@@ -162,13 +161,13 @@ const WeatherChart = ({ weatherData }: WeatherChartProps) => {
 
           <Line
             type="monotone"
-            dataKey="pressure"
-            stroke={colors.pressure}
+            dataKey="soilTemperature"
+            stroke={colors.soilTemperature}
             strokeWidth={3}
             dot={false}
             activeDot={{
               r: 6,
-              fill: colors.pressure,
+              fill: colors.soilTemperature,
               stroke: "#fff",
               strokeWidth: 3,
             }}
