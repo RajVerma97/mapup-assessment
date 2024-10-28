@@ -9,28 +9,18 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { MonthlyHumidityData } from "./Dashboard";
 
-const humidityData = [
-  { month: "January", avgHumidity: 80 },
-  { month: "February", avgHumidity: 75 },
-  { month: "March", avgHumidity: 70 },
-  { month: "April", avgHumidity: 65 },
-  { month: "May", avgHumidity: 60 },
-  { month: "June", avgHumidity: 55 },
-  { month: "July", avgHumidity: 50 },
-  { month: "August", avgHumidity: 55 },
-  { month: "September", avgHumidity: 60 },
-  { month: "October", avgHumidity: 70 },
-  { month: "November", avgHumidity: 75 },
-  { month: "December", avgHumidity: 80 },
-];
+interface AvgHumidityChartProps {
+  data: MonthlyHumidityData[];
+}
 
-const AvgHumidityChart = ({ data = humidityData }) => {
+const AvgHumidityChart = ({ data }: AvgHumidityChartProps) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} width={350} height={400} margin={{ top: 20 }}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="month" />
+        <XAxis dataKey="monthName" />
         <YAxis />
         <Tooltip />
         <Legend />

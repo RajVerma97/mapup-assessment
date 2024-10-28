@@ -12,10 +12,10 @@ import {
 import { WeatherChartData } from "./Dashboard";
 
 interface WeatherChartProps {
-  weatherData: WeatherChartData[];
+  data: WeatherChartData[];
 }
 
-const WeatherChart = ({ weatherData }: WeatherChartProps) => {
+const WeatherChart = ({ data }: WeatherChartProps) => {
   const colorSchemes = {
     option1: {
       temperature: "#ff6b6b",
@@ -104,7 +104,7 @@ const WeatherChart = ({ weatherData }: WeatherChartProps) => {
         <LineChart
           width={700}
           height={300}
-          data={weatherData}
+          data={data}
           margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
         >
           <CartesianGrid

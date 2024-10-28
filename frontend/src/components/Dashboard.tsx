@@ -23,7 +23,6 @@ export interface CloudCoverData {
   avgMid: number;
   avgHigh: number;
 }
-import useFetchWeatherData from "@/app/hooks/use-fetch-weather-data";
 import WeatherChart from "./WeatherChart";
 import CloudCoverWeatherChart from "./CloudCoverWeatherChart";
 import { socket } from "@/socket-io";
@@ -62,6 +61,21 @@ const MetricCard = ({
   </motion.div>
 );
 
+export interface MonthlyTemperatureData {
+  month: string;
+  year: string;
+  avgTemp: number;
+  monthName: string;
+  formattedDate: string;
+}
+export interface MonthlyHumidityData {
+  month: string;
+  year: string;
+  avgHumidity: number;
+  monthName: string;
+  formattedDate: string;
+}
+
 export default function Dashboard() {
   const fileUploadMutation = useFileUploadMutation();
 
@@ -89,29 +103,57 @@ export default function Dashboard() {
   // }
 
   const [data, setData] = useState<WeatherDataList>([]);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(100);
+  const [filter, setFilter] = useState("");
+  const [sort, setSort] = useState("asc");
+  const [cloudCoverData, setCloudCoverData] = useState<CloudCoverData[]>([]);
+  const [monthlyTemperatureData, setMonthlyTemperatureData] = useState<
+    MonthlyTemperatureData[]
+  >([]);
+  const [monthlyHumidityData, setMonthlyHumidityData] = useState<
+    MonthlyHumidityData[]
+  >([]);
 
   useEffect(() => {
-    let previousData: WeatherDataList = [];
-
-    const handleSocketData = (serverData: WeatherDataList) => {
-      console.log("server");
-      console.log(serverData);
-      if (previousData.length > 0) {
+    const fetchData = async () => {
+      try {
+        socket.emit("fetchData", { page, limit, filter, sort });
+        socket.emit("fetchCloudCoverData");
+        socket.emit("fetchMonthlyTemperatureData");
+        socket.emit("fetchMonthlyHumidityData");
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-      setData(serverData);
-      previousData = serverData;
     };
 
-    socket.on("time", (data) => {
-      handleSocketData(data);
+    socket.on("data", (data: WeatherDataList) => {
+      setData(data);
     });
 
+    socket.on("cloudCoverData", (data: CloudCoverData[]) => {
+      setCloudCoverData(data);
+    });
+
+    socket.on("disconnect", () => {});
+    socket.on("monthlyTemperatureData", (data: MonthlyTemperatureData[]) => {
+      setMonthlyTemperatureData(data);
+    });
+    socket.on("monthlyHumidityData", (data: MonthlyHumidityData[]) => {
+      // setMonthlyTemperatureData(data);
+      setMonthlyHumidityData(data);
+    });
+
+    fetchData();
+
     return () => {
-      socket.off("time", (data) => {
-        handleSocketData(data);
-      });
+      socket.off("data");
+      socket.off("cloudCoverData");
+      socket.off("disconnect");
+      socket.off("monthlyTemperatureData");
+      socket.off("monthlyHumidityData");
     };
-  }, []);
+  }, [page, limit, filter, sort]);
 
   const WeatherChartData: WeatherChartData[] = data?.map(
     (item: WeatherData) => ({
@@ -122,60 +164,6 @@ export default function Dashboard() {
       soilTemperature: parseFloat(item.soil_temperature_7_to_28cm),
     })
   );
-
-  const aggregateCloudCoverData = (data: WeatherData[]): CloudCoverData[] => {
-    const monthDataMap: {
-      [key: string]: { low: number[]; mid: number[]; high: number[] };
-    } = {};
-
-    data?.forEach((item: WeatherData) => {
-      const month = dayjs(item.time).format("MMMM YYYY"); // Format the month as needed
-
-      if (!monthDataMap[month]) {
-        monthDataMap[month] = { low: [], mid: [], high: [] };
-      }
-
-      monthDataMap[month].low.push(Number(item.cloud_cover_low));
-      monthDataMap[month].mid.push(Number(item.cloud_cover_mid));
-      monthDataMap[month].high.push(Number(item.cloud_cover_high));
-    });
-
-    const cloudCoverData: CloudCoverData[] = Object.entries(monthDataMap).map(
-      ([month, values]) => ({
-        month,
-        avgLow:
-          values.low.length > 0
-            ? Number(
-                (
-                  values.low.reduce((sum, value) => sum + value, 0) /
-                  values.low.length
-                ).toFixed(1)
-              )
-            : 0,
-        avgMid:
-          values.mid.length > 0
-            ? Number(
-                (
-                  values.mid.reduce((sum, value) => sum + value, 0) /
-                  values.mid.length
-                ).toFixed(1)
-              )
-            : 0,
-        avgHigh:
-          values.high.length > 0
-            ? Number(
-                (
-                  values.high.reduce((sum, value) => sum + value, 0) /
-                  values.high.length
-                ).toFixed(1)
-              )
-            : 0,
-      })
-    );
-
-    return cloudCoverData;
-  };
-  const cloudCoverData = aggregateCloudCoverData(data);
 
   return (
     <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
@@ -233,14 +221,14 @@ export default function Dashboard() {
       </div>
 
       <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
-        <WeatherChart weatherData={WeatherChartData} />
+        <WeatherChart data={WeatherChartData} />
       </div>
       <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
-        <CloudCoverWeatherChart cloudCoverData={cloudCoverData} />
+        <CloudCoverWeatherChart data={cloudCoverData} />
       </div>
       <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-between items-center gap-4 text-center overflow-hidden  ">
-        <MonthlyAverageTemperatureChart />
-        <AvgHumidityChart />
+        <MonthlyAverageTemperatureChart data={monthlyTemperatureData} />
+        <AvgHumidityChart data={monthlyHumidityData} />
         {/* <WindSpeedHeatmap /> */}
       </div>
       <ToastManager />

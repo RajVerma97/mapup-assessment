@@ -4,7 +4,6 @@ import bcrypt, { hash } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const registerUser = async (req: Request, res: Response) => {
-  console.log('register');
   const { email, username, password, role } = req.body;
 
   const dbUser = await User.findOne({ email });
@@ -24,7 +23,6 @@ export const registerUser = async (req: Request, res: Response) => {
 
   try {
     await newUser.save();
-    console.log('saved');
     res.status(200).json({ message: 'User Registered successfully' });
   } catch (error) {
     return res.status(500).json({
@@ -35,7 +33,6 @@ export const registerUser = async (req: Request, res: Response) => {
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-  console.log('login user bakcend');
   const { email, password } = req.body;
 
   try {
@@ -43,9 +40,6 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
-    console.log('login');
-
-    console.log(user);
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {

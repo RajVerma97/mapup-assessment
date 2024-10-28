@@ -16,6 +16,9 @@ import WeatherData from './api/models/weather';
 import { Server } from 'socket.io';
 import { CronJob } from 'cron';
 import http from 'http';
+import fetchCloudCoverMonthlyData from './utils/fetch-cloud-cover-monthly-data';
+import fetchMontlyTemperatureData from './utils/fetch-montly-temperature-data';
+import fetchMonthlyHumidityData from './utils/fetch-monthly-humidity-data';
 
 dotenv.config();
 
@@ -43,89 +46,99 @@ const io = new Server(httpServer, {
   transports: ['websocket', 'polling'],
 });
 
-// export const getRandomRevenueData = () => {
-//   const random_data = [
-//     {
-//       name: 'BHR',
-//       total_revenue: Math.floor(Math.random() * 10000),
-//       loss: Math.floor(Math.random() * 10000),
-//     },
-//     {
-//       name: 'RAD',
-//       total_revenue: Math.floor(Math.random() * 10000),
-//       loss: Math.floor(Math.random() * 10000),
-//     },
-//     {
-//       name: 'FDS',
-//       total_revenue: Math.floor(Math.random() * 10000),
-//       loss: Math.floor(Math.random() * 10000),
-//     },
-//     {
-//       name: 'AVF',
-//       total_revenue: Math.floor(Math.random() * 10000),
-//       loss: Math.floor(Math.random() * 10000),
-//     },
-//     {
-//       name: 'RTY',
-//       total_revenue: Math.floor(Math.random() * 10000),
-//       loss: Math.floor(Math.random() * 10000),
-//     },
-//     {
-//       name: 'VFV',
-//       total_revenue: Math.floor(Math.random() * 10000),
-//       loss: Math.floor(Math.random() * 10000),
-//     },
-//     {
-//       name: 'GFL',
-//       total_revenue: Math.floor(Math.random() * 10000),
-//       loss: Math.floor(Math.random() * 1000),
-//     },
-//   ];
+// io.on('connection', async (socket) => {
+//   const job = new CronJob('*/5 * * * * *', async (params) => {
+//     const { page, limit, filter, sort } = params;
+//     const query = WeatherData.find();
 
-//   return new Promise((resolve, reject) => {
-//     const revenueData = random_data?.map((item) => {
-//       const profit = item?.total_revenue - item?.loss;
-//       return { ...item, profit };
-//     });
-//     if (random_data) {
-//       resolve(revenueData);
-//     } else {
-//       reject(new Error('Profit cannot be negative.'));
+//     if (sort) {
+//       query.sort({ time: sort === 'asc' ? 1 : -1 });
 //     }
+//     const data = await query
+//       .skip((page - 1) * limit)
+//       .limit(limit)
+//       .exec();
+//     socket.emit('time', data);
 //   });
-// };
 
-// async function fetchCloudCoverMonthlyData() {
-//   return await WeatherData.aggregate([
-//     {
-//       $group: {
-//         _id: { $month: { $dateFromString: { dateString: '$time' } } }, // Convert string to Date and group by month
-//         avgLow: { $avg: { $toDouble: '$cloud_cover_low' } }, // Convert string to double for average calculation
-//         avgMid: { $avg: { $toDouble: '$cloud_cover_mid' } }, // Convert string to double for average calculation
-//         avgHigh: { $avg: { $toDouble: '$cloud_cover_high' } }, // Convert string to double for average calculation
-//       },
-//     },
-//     {
-//       $project: {
-//         month: '$_id', // Rename _id to month
-//         avgLow: { $round: [{ $ifNull: ['$avgLow', 0] }, 1] }, // Round to 1 decimal place
-//         avgMid: { $round: [{ $ifNull: ['$avgMid', 0] }, 1] }, // Round to 1 decimal place
-//         avgHigh: { $round: [{ $ifNull: ['$avgHigh', 0] }, 1] }, // Round to 1 decimal place
-//       },
-//     },
-//   ]);
-// }
+//   job.start();
 
-io.on('connection', async (socket) => {
-  const job = new CronJob('*/5 * * * * *', async () => {
-    const data = await WeatherData.find().limit(10);
-    socket.emit('time', data);
+//   socket.on('disconnect', () => {
+//     job.stop();
+//   });
+// });
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('fetchCloudCoverData', async () => {
+    console.log('Received request for cloud cover data');
+    try {
+      const cloudCoverData = await fetchCloudCoverMonthlyData();
+      // console.log('Sending cloud cover data:', cloudCoverData);
+      socket.emit('cloudCoverData', cloudCoverData);
+    } catch (error) {
+      console.error('Error fetching cloud cover data:', error);
+      socket.emit('error', { message: 'Failed to fetch cloud cover data' });
+    }
+  });
+  socket.on('fetchMonthlyTemperatureData', async () => {
+    console.log('Received request for monthly temperature data');
+    try {
+      const monthlyTemperatureData = await fetchMontlyTemperatureData();
+
+      console.log('Sending monthly temperature data:', monthlyTemperatureData);
+      socket.emit('monthlyTemperatureData', monthlyTemperatureData);
+    } catch (error) {
+      console.error('Error fetching monthly temperature data:', error);
+      socket.emit('error', {
+        message: 'Failed to fetch monthly temperature data',
+      });
+    }
+  });
+  socket.on('fetchMonthlyHumidityData', async () => {
+    console.log('Received request for monthly temperature data');
+    try {
+      const monthlyHumidityData = await fetchMonthlyHumidityData();
+
+      console.log('Sending monthly humidity data:', monthlyHumidityData);
+      socket.emit('monthlyHumidityData', monthlyHumidityData);
+    } catch (error) {
+      console.error('Error fetching monthly humidity data:', error);
+      socket.emit('error', {
+        message: 'Failed to fetch monthly humidity data',
+      });
+    }
   });
 
-  job.start();
+  socket.on('fetchData', async (params) => {
+    console.log('Received request for data with params:', params);
+    const { page, limit, filter, sort } = params;
+
+    try {
+      const query = WeatherData.find();
+
+      if (filter) {
+        query.where('field_to_filter').equals(filter);
+      }
+
+      if (sort) {
+        query.sort({ time: sort === 'asc' ? 1 : -1 });
+      }
+
+      const data = await query
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
+
+      socket.emit('data', data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      socket.emit('error', { message: 'Failed to fetch data' });
+    }
+  });
 
   socket.on('disconnect', () => {
-    job.stop();
+    console.log('Client disconnected');
   });
 });
 
@@ -136,8 +149,6 @@ const MONGODBURI = process.env.MONGODB_URI;
 const upload = multer({ dest: 'uploads/' });
 
 app.get('/', (req: Request, res: Response) => {
-  console.log('from the index');
-  console.log(req.user);
   res.render('index', { user: req.user });
 });
 
