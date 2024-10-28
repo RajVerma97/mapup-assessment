@@ -24,5 +24,5 @@ export const setupSocketIO = (httpServer) => {
     });
   });
 
-  return io; // Optionally return the io instance
+  return io;
 };
