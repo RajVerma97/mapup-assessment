@@ -6,6 +6,8 @@ import redisConnection from '../queues/redis';
 import WeatherData from '../api/models/weather';
 import { json } from 'body-parser';
 
+let skipRows = 3;
+
 const worker = new Worker(
   'csv-processing',
   async (job: Job) => {
@@ -14,35 +16,42 @@ const worker = new Worker(
     const results: any[] = [];
 
     fs.createReadStream(filePath)
-      .pipe(csvParser())
+      .pipe(
+        csvParser({
+          skipLines: skipRows,
+          headers: true,
+        })
+      )
       .on('data', (data) => {
         results.push(data);
       })
       .on('end', async () => {
         try {
           for (const item of results) {
-            console.log(item.hourly);
+            const weatherData = {
+              time: item._0,
+              temperature_2m: item._1,
+              dew_point_2m: item._2,
+              precipitation: item._3,
+              rain: item._4,
+              snowfall: item._5,
+              snow_depth: item._6,
+              weather_code: item._7,
+              pressure_msl: item._8,
+              surface_pressure: item._9,
+              cloud_cover_low: item._10,
+              cloud_cover_mid: item._11,
+              cloud_cover_high: item._12,
+              wind_speed_100m: item._13,
+              wind_direction_100m: item._14,
+              soil_temperature_7_to_28cm: item._15,
+              soil_moisture_7_to_28cm: item._16,
+            };
 
-            //the json string is stringified twice, so we need to parse it twice
-            const hourlyDataString = JSON.parse(item.hourly);
-            const hourly = JSON.parse(hourlyDataString);
+            const mongoDocument = new WeatherData(weatherData);
+            await mongoDocument.save();
 
-            const weatherData = new WeatherData({
-              latitude: item.latitude,
-              longitude: item.longitude,
-              elevation: item.elevation,
-              utc_offset_seconds: item.utc_offset_seconds,
-              timezone: item.timezone,
-              timezone_abbreviation: item.timezone_abbreviation,
-              generationtime_ms: item.generationtime_ms,
-              hourly_units: {
-                time: item.hourly_units?.time || 'iso8601',
-                temperature_2m: item.hourly_units?.temperature_2m || '°C',
-              },
-              hourly,
-            });
-            await weatherData.save();
-            console.log('CSV processed and data stored in MongoDB.');
+            console.log('Weather data saved:', mongoDocument);
           }
         } catch (error: unknown) {
           if (error instanceof Error) {

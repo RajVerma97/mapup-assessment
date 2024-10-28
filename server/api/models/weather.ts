@@ -1,20 +1,73 @@
 const mongoose = require('mongoose');
 
 const weatherDataSchema = new mongoose.Schema({
-  latitude: { type: Number, required: true },
-  longitude: { type: Number, required: true },
-  elevation: { type: Number, required: true },
-  utc_offset_seconds: { type: Number, required: true },
-  timezone: { type: String, required: true },
-  timezone_abbreviation: { type: String, required: true },
-  generationtime_ms: { type: Number },
-  hourly_units: {
-    time: String,
-    temperature_2m: String,
+  time: {
+    type: String,
+    required: true,
   },
-  hourly: {
-    time: [{ type: String }],
-    temperature_2m: [{ type: Number }],
+  temperature_2m: {
+    type: String,
+    required: true,
+  },
+  dew_point_2m: {
+    type: String,
+    required: true,
+  },
+  precipitation: {
+    type: String,
+    required: true,
+  },
+  rain: {
+    type: String,
+    required: true,
+  },
+  snowfall: {
+    type: String,
+    required: true,
+  },
+  snow_depth: {
+    type: String,
+    required: true,
+  },
+  weather_code: {
+    type: String,
+    required: true,
+  },
+  pressure_msl: {
+    type: String,
+    required: true,
+  },
+  surface_pressure: {
+    type: String,
+    required: true,
+  },
+  cloud_cover_low: {
+    type: String,
+    required: true,
+  },
+  cloud_cover_mid: {
+    type: String,
+    required: true,
+  },
+  cloud_cover_high: {
+    type: String,
+    required: true,
+  },
+  wind_speed_100m: {
+    type: String,
+    required: true,
+  },
+  wind_direction_100m: {
+    type: String,
+    required: true,
+  },
+  soil_temperature_7_to_28cm: {
+    type: String,
+    required: true,
+  },
+  soil_moisture_7_to_28cm: {
+    type: String,
+    required: true,
   },
 });
 

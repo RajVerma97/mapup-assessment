@@ -94,7 +94,7 @@ export const getRandomRevenueData = () => {
 
 io.on('connection', (socket) => {
   const job = new CronJob('*/5 * * * * *', async () => {
-    const data = await getRandomRevenueData();
+    const data = await WeatherData.find();
     socket.emit('weather', data);
   });
 
