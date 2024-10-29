@@ -94,10 +94,6 @@ export default function Dashboard() {
         message: data?.message || "File uploaded successfully",
         status: "success",
       });
-
-      // socket.emit("updatedData", (updatedData) => {
-      //   console.log("updatedData", updatedData);
-      // });
     },
     onError: (error: AxiosError<ErrorResponse>) => {
       const errorMessage = error?.response?.data?.message;
@@ -123,7 +119,7 @@ export default function Dashboard() {
   const [page] = useState(1);
   const [limit] = useState(100);
   const [filter] = useState("");
-  const [sort] = useState("desc");
+  const [sort] = useState("asc");
   const [cloudCoverData, setCloudCoverData] = useState<CloudCoverData[]>([]);
   const [monthlyTemperatureData, setMonthlyTemperatureData] = useState<
     MonthlyTemperatureData[]
@@ -160,11 +156,9 @@ export default function Dashboard() {
 
     socket.on("disconnect", () => {});
     socket.on("monthlyTemperatureData", (data: MonthlyTemperatureData[]) => {
-     
       setMonthlyTemperatureData(data);
     });
     socket.on("monthlyHumidityData", (data: MonthlyHumidityData[]) => {
-      
       setMonthlyHumidityData(data);
     });
     socket.on("weatherSeasonChartData", (data: WeatherSeasonData[]) => {
@@ -181,7 +175,7 @@ export default function Dashboard() {
       socket.off("monthlyHumidityData");
       socket.off("weatherSeasonChartData");
     };
-  }, [page, limit, filter, sort]);
+  });
 
   const weatherChartData: WeatherChartData[] = weatherData?.map(
     (item: WeatherData) => ({

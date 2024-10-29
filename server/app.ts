@@ -48,10 +48,8 @@ const io = new Server(httpServer, {
 });
 
 io.on('connection', (socket) => {
-  console.log('New client connected');
-
   socket.on('fetchCloudCoverData', async () => {
-    console.log('Received request for cloud cover data');
+    // console.log('Received request for cloud cover data');
     try {
       const cloudCoverData = await fetchCloudCoverMonthlyData();
       // console.log('Sending cloud cover data:', cloudCoverData);
@@ -62,7 +60,7 @@ io.on('connection', (socket) => {
     }
   });
   socket.on('fetchMonthlyTemperatureData', async () => {
-    console.log('Received request for monthly temperature data');
+    // console.log('Received request for monthly temperature data');
     try {
       const monthlyTemperatureData = await fetchMontlyTemperatureData();
 
@@ -76,7 +74,7 @@ io.on('connection', (socket) => {
     }
   });
   socket.on('fetchMonthlyHumidityData', async () => {
-    console.log('Received request for monthly temperature data');
+    // console.log('Received request for monthly temperature data');
     try {
       const monthlyHumidityData = await fetchMonthlyHumidityData();
 
@@ -90,11 +88,11 @@ io.on('connection', (socket) => {
     }
   });
   socket.on('fetchWeatherSeasonChartData', async () => {
-    console.log('Received request for monthly temperature data');
+    // console.log('Received request for monthly temperature data');
     try {
       const weatherSeasonChartData = await fetchWeatherSeasonData();
 
-      console.log('Sending weather season  data:', weatherSeasonChartData);
+      // console.log('Sending weather season  data:', weatherSeasonChartData);
       socket.emit('weatherSeasonChartData', weatherSeasonChartData);
     } catch (error) {
       console.error('Error fetching monthly humidity data:', error);
@@ -105,7 +103,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('fetchData', async (params) => {
-    console.log('Received request for data with params:', params);
+    // console.log('Received request for data with params:', params);
     const { page, limit, filter, sort } = params;
 
     try {

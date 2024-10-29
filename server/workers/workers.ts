@@ -11,7 +11,7 @@ let skipRows = 4;
 
 const worker = new Worker(
   'csv-processing',
-  async (job: Job) => {
+  async (job: Job, io: any) => {
     const { filePath } = job.data;
 
     const results: any[] = [];
@@ -28,7 +28,8 @@ const worker = new Worker(
       })
       .on('end', async () => {
         try {
-          for (const item of results) {
+          const temp = results.splice(0, 200);
+          for (const item of temp) {
             const weatherData = {
               time: item._0,
               temperature_2m: item._1,
@@ -51,8 +52,6 @@ const worker = new Worker(
 
             const mongoDocument = new WeatherData(weatherData);
             await mongoDocument.save();
-
-            console.log('Weather data saved:', mongoDocument);
           }
         } catch (error: unknown) {
           if (error instanceof Error) {
