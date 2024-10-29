@@ -1,3 +1,4 @@
+import { CloudCoverData } from "@/types/dashboard";
 import React from "react";
 import {
   BarChart,
@@ -9,7 +10,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { CloudCoverData } from "./Dashboard";
 
 interface CloudCoverWeatherChartProps {
   data: CloudCoverData[];

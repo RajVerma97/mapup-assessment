@@ -8,8 +8,7 @@ import {
   RadialLinearScale,
 } from "chart.js";
 import { PolarArea } from "react-chartjs-2";
-
-import { DailyWeatherData } from "./Dashboard";
+import { DailyWeatherData } from "@/types/dashboard";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, RadialLinearScale);
 

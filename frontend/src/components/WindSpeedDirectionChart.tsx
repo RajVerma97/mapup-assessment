@@ -8,13 +8,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { WindSpeedDirectionData } from "@/types/dashboard";
 
 ChartJS.register(LinearScale, PointElement, Title, Tooltip, Legend);
-
-interface WindSpeedDirectionData {
-  wind_direction_100m: number;
-  wind_speed_100m: number;
-}
 
 interface WindSpeedDirectionChartProps {
   data: WindSpeedDirectionData[];

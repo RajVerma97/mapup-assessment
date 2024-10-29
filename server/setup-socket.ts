@@ -1,28 +1,27 @@
 import { Server } from 'socket.io';
-import { CronJob } from 'cron';
 import http from 'http';
-import { getRandomRevenueData } from './app';
 
-export const setupSocketIO = (httpServer) => {
-  const io = new Server(httpServer, {
-    cors: {
-      origin: 'http://localhost:3000',
-    },
-    transports: ['websocket', 'polling'],
-  });
+class SocketService {
+  public io;
 
-  io.on('connection', (socket) => {
-    const job = new CronJob('*/5 * * * * *', async () => {
-      const data = await getRandomRevenueData();
-      socket.emit('weather', data);
+  constructor(server: http.Server) {
+    this.io = new Server(server, {
+      cors: {
+        origin: 'http://localhost:3000',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+      },
     });
 
-    job.start();
-
-    socket.on('disconnect', () => {
-      job.stop();
+    this.io.on('connection', (socket) => {
+      console.log('User connected');
     });
-  });
+  }
 
-  return io;
-};
+  emit(event: string, data: any) {
+    console.log('Emitting event:', event, data);
+    this.io.emit(event, data);
+  }
+}
+
+module.exports = SocketService;

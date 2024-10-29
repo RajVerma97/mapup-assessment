@@ -7,27 +7,21 @@ import useFileUploadMutation from "@/app/hooks/use-file-upload";
 import { notify, ToastManager } from "./ToastManager";
 import { WeatherData, WeatherDataList } from "@/types/weather-data";
 import dayjs from "dayjs";
-
-export interface WeatherChartData {
-  time: string;
-  temperature: number;
-  humidity: number;
-  windSpeed: number;
-  soilTemperature: number;
-}
-
-export interface CloudCoverData {
-  month: string;
-  avgLow: number;
-  avgMid: number;
-  avgHigh: number;
-}
-
 import { socket } from "@/socket-io";
 
 import dynamic from "next/dynamic";
 import { AxiosError } from "axios";
 import { ErrorResponse } from "@/types/error-response";
+import {
+  CloudCoverData,
+  DailyWeatherData,
+  FileUploadAuthResponse,
+  MonthlyHumidityData,
+  MonthlyTemperatureData,
+  WeatherChartData,
+  WeatherSeasonData,
+  WindSpeedDirectionData,
+} from "@/types/dashboard";
 
 const WeatherChart = dynamic(() => import("./WeatherChart"), {
   ssr: false,
@@ -93,53 +87,6 @@ const MetricCard = ({
   </motion.div>
 );
 
-export interface MonthlyTemperatureData {
-  month: string;
-  year: string;
-  avgTemp: number;
-  monthName: string;
-  formattedDate: string;
-}
-export interface MonthlyHumidityData {
-  month: string;
-  year: string;
-  avgHumidity: number;
-  monthName: string;
-  formattedDate: string;
-}
-
-export interface WindSpeedDirectionData {
-  wind_speed_100m: number;
-  wind_direction_100m: number;
-}
-export interface WeatherSeasonData {
-  season: string;
-  year: number;
-  avgTemp: number;
-  avgDewPoint: number;
-  avgPrecipitation: number;
-  avgRain: number;
-  avgSnowfall: number;
-  avgWindSpeed: number;
-  avgCloudCoverLow: number;
-  avgCloudCoverMid: number;
-  avgCloudCoverHigh: number;
-  avgSoilTemp: number;
-  avgSoilMoisture: number;
-  formattedPeriod: string;
-}
-
-export interface DailyWeatherData {
-  date: string;
-  avgRain: number;
-  avgPrecipitation: number;
-  avgSnowfall: number;
-}
-
-export interface FileUploadAuthResponse {
-  message: string;
-}
-
 export default function Dashboard() {
   const fileUploadMutation = useFileUploadMutation({
     onSuccess: (data: FileUploadAuthResponse) => {
@@ -173,10 +120,10 @@ export default function Dashboard() {
   };
 
   const [weatherData, setWeatherData] = useState<WeatherDataList>([]);
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
   const [limit] = useState(100);
-  const [filter, setFilter] = useState("");
-  const [sort, setSort] = useState("desc");
+  const [filter] = useState("");
+  const [sort] = useState("desc");
   const [cloudCoverData, setCloudCoverData] = useState<CloudCoverData[]>([]);
   const [monthlyTemperatureData, setMonthlyTemperatureData] = useState<
     MonthlyTemperatureData[]
@@ -213,9 +160,11 @@ export default function Dashboard() {
 
     socket.on("disconnect", () => {});
     socket.on("monthlyTemperatureData", (data: MonthlyTemperatureData[]) => {
+     
       setMonthlyTemperatureData(data);
     });
     socket.on("monthlyHumidityData", (data: MonthlyHumidityData[]) => {
+      
       setMonthlyHumidityData(data);
     });
     socket.on("weatherSeasonChartData", (data: WeatherSeasonData[]) => {

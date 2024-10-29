@@ -1,3 +1,4 @@
+import { WeatherChartData } from "@/types/dashboard";
 import React from "react";
 import {
   LineChart,
@@ -9,7 +10,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { WeatherChartData } from "./Dashboard";
 
 interface WeatherChartProps {
   data: WeatherChartData[];
