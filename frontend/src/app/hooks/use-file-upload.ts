@@ -1,23 +1,20 @@
 import fileUpload from "@/queries/file-upload";
 import useAuthenticatedMutation from "./use-authenticated-mutation";
-import { notify } from "@/components/ToastManager";
 import { AxiosError } from "axios";
 import { ErrorResponse } from "@/types/error-response";
+import { FileUploadAuthResponse } from "@/components/Dashboard";
 
-export default function useFileUploadMutation() {
+export default function useFileUploadMutation(options?: {
+  onSuccess?: (data: FileUploadAuthResponse) => void;
+  onError?: (error: AxiosError<ErrorResponse>) => void;
+}) {
   return useAuthenticatedMutation({
     mutationFn: async (data: FormData) => fileUpload(data),
-    onSuccess: (data) =>
-      notify({
-        message: data?.message || "File uploaded successfully",
-        status: "success",
-      }),
+    onSuccess: (data) => {
+      options?.onSuccess?.(data);
+    },
     onError: (error: AxiosError<ErrorResponse>) => {
-      const errorMessage = error?.response?.data?.message;
-      notify({
-        message: errorMessage || "Something went wrong",
-        status: "error",
-      });
+      options?.onError?.(error);
     },
   });
 }

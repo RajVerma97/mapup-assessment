@@ -19,6 +19,7 @@ import http from 'http';
 import fetchCloudCoverMonthlyData from './utils/fetch-cloud-cover-monthly-data';
 import fetchMontlyTemperatureData from './utils/fetch-montly-temperature-data';
 import fetchMonthlyHumidityData from './utils/fetch-monthly-humidity-data';
+import fetchWeatherSeasonData from './utils/fetch-weather-season-chart-data';
 
 dotenv.config();
 
@@ -86,7 +87,7 @@ io.on('connection', (socket) => {
     try {
       const monthlyTemperatureData = await fetchMontlyTemperatureData();
 
-      console.log('Sending monthly temperature data:', monthlyTemperatureData);
+      // console.log('Sending monthly temperature data:', monthlyTemperatureData);
       socket.emit('monthlyTemperatureData', monthlyTemperatureData);
     } catch (error) {
       console.error('Error fetching monthly temperature data:', error);
@@ -100,8 +101,22 @@ io.on('connection', (socket) => {
     try {
       const monthlyHumidityData = await fetchMonthlyHumidityData();
 
-      console.log('Sending monthly humidity data:', monthlyHumidityData);
+      // console.log('Sending monthly humidity data:', monthlyHumidityData);
       socket.emit('monthlyHumidityData', monthlyHumidityData);
+    } catch (error) {
+      console.error('Error fetching monthly humidity data:', error);
+      socket.emit('error', {
+        message: 'Failed to fetch monthly humidity data',
+      });
+    }
+  });
+  socket.on('fetchWeatherSeasonChartData', async () => {
+    console.log('Received request for monthly temperature data');
+    try {
+      const weatherSeasonChartData = await fetchWeatherSeasonData();
+
+      console.log('Sending weather season  data:', weatherSeasonChartData);
+      socket.emit('weatherSeasonChartData', weatherSeasonChartData);
     } catch (error) {
       console.error('Error fetching monthly humidity data:', error);
       socket.emit('error', {
@@ -122,7 +137,7 @@ io.on('connection', (socket) => {
       }
 
       if (sort) {
-        query.sort({ time: sort === 'asc' ? 1 : -1 });
+        query.sort({ createdAt: sort === 'asc' ? 1 : -1 });
       }
 
       const data = await query

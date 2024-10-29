@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const weatherDataSchema = new mongoose.Schema({
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
   time: {
     type: String,
     required: true,

@@ -5,6 +5,7 @@ import { Job } from 'bullmq';
 import redisConnection from '../queues/redis';
 import WeatherData from '../api/models/weather';
 import { json } from 'body-parser';
+import { Socket } from 'socket.io';
 
 let skipRows = 4;
 

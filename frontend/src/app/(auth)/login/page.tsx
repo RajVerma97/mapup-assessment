@@ -11,7 +11,7 @@ interface LoginProps {
   setPath: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function Login({ setPath }: LoginProps) {
+export default function Login({}: LoginProps) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 

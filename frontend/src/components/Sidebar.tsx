@@ -101,10 +101,10 @@ export default function Sidebar({ className, setPath }: SidebarProps) {
             className="aspect-square object-cover rounded-full"
           />
           <h1 className="text-2xl  text-black">
-            {user ? user.username : "No User"}
+            {user ? user?.username : "No User"}
           </h1>
           <h4 className="text-xl  text-black">
-            {user ? user.role.toUpperCase() : "No Role"}
+            {user ? user?.role.toUpperCase() : "No Role"}
           </h4>
         </div>
 
