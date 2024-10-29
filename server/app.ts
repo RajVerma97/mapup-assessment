@@ -47,27 +47,6 @@ const io = new Server(httpServer, {
   transports: ['websocket', 'polling'],
 });
 
-// io.on('connection', async (socket) => {
-//   const job = new CronJob('*/5 * * * * *', async (params) => {
-//     const { page, limit, filter, sort } = params;
-//     const query = WeatherData.find();
-
-//     if (sort) {
-//       query.sort({ time: sort === 'asc' ? 1 : -1 });
-//     }
-//     const data = await query
-//       .skip((page - 1) * limit)
-//       .limit(limit)
-//       .exec();
-//     socket.emit('time', data);
-//   });
-
-//   job.start();
-
-//   socket.on('disconnect', () => {
-//     job.stop();
-//   });
-// });
 io.on('connection', (socket) => {
   console.log('New client connected');
 
@@ -182,38 +161,6 @@ app.post('/upload', upload.single('file'), (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error uploading file' });
   }
 });
-
-// app.get('/data', verifyToken, async (req: Request, res: Response) => {
-//   console.log('dhsldf');
-//   const { page = 1, limit = 5, sort = 'desc', filter = '' } = req.query;
-//   console.log('backend');
-//   console.log(sort);
-
-//   const pageNum = Number(page);
-//   const limitNum = Number(limit);
-
-//   const data = await WeatherData.find()
-//     .skip((pageNum - 1) * limitNum)
-//     .limit(limitNum)
-//     .sort({ time: sort == 'asc' ? 1 : -1 });
-
-//   console.log(data);
-
-//   res.status(200).json({ data, message: 'Data fetched successfully' });
-// });
-// app.get(
-//   '/cloud-cover-data',
-//   verifyToken,
-//   async (req: Request, res: Response) => {
-//     console.log('cloud cover');
-//     const { year } = req.query;
-
-//     const data = await fetchCloudCoverMonthlyData();
-//     console.log(data);
-
-//     res.status(200).json({ data, message: 'Data fetched successfully' });
-//   }
-// );
 
 app.use('/admin/queues', serverAdapter.getRouter());
 
