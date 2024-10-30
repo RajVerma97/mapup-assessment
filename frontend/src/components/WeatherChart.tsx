@@ -10,46 +10,21 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useMediaQuery } from "react-responsive";
 
 interface WeatherChartProps {
   data: WeatherChartData[];
 }
 
 const WeatherChart = ({ data }: WeatherChartProps) => {
-  const colorSchemes = {
-    option1: {
-      temperature: "#ff6b6b",
-      humidity: "#4dabf7",
-      soilTemperature: "#be4bdb",
-      windSpeed: "#20c997",
-    },
-    option2: {
-      temperature: "#ff6b6b",
-      humidity: "#4dabf7",
-      soilTemperature: "#f06595",
-      windSpeed: "#20c997",
-    },
-    option3: {
-      temperature: "#ff6b6b",
-      humidity: "#4dabf7",
-      soilTemperature: "#7950f2",
-      windSpeed: "#20c997",
-    },
-    option4: {
-      temperature: "#ff6b6b",
-      humidity: "#4dabf7",
-      soilTemperature: "#e64980",
-      windSpeed: "#20c997",
-    },
-    option5: {
-      temperature: "#ff6b6b",
-      humidity: "#4dabf7",
-      soilTemperature: "#cc5de8",
-      windSpeed: "#20c997",
-    },
-  };
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
-  const colors = colorSchemes.option4;
+  const colors = {
+    temperature: "#ff6b6b",
+    humidity: "#4dabf7",
+    soilTemperature: "#e64980",
+    windSpeed: "#20c997",
+  };
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -102,8 +77,8 @@ const WeatherChart = ({ data }: WeatherChartProps) => {
     <div className="w-full h-[400px] p-6 bg-white rounded-xl shadow-sm">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          width={700}
-          height={300}
+          width={isMobile ? 400 : 700}
+          height={isMobile ? 200 : 350}
           data={data}
           margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
         >

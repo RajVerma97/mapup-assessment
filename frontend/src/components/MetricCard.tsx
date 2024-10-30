@@ -18,7 +18,7 @@ export default function MetricCard({
       initial={{ scale: 1 }}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.1 }}
-      className="bg-white rounded-xl p-6 shadow-lg"
+      className="bg-white rounded-xl  p-4 md:p-6 shadow-lg"
     >
       <div className="flex items-center gap-4">
         <div
@@ -29,7 +29,7 @@ export default function MetricCard({
         </div>
         <div>
           <p className="text-sm text-gray-600">{title}</p>
-          <p className="text-2xl font-semibold">{value}</p>
+          <p className=" text-md md:text-2xl font-semibold">{value}</p>
         </div>
       </div>
     </motion.div>

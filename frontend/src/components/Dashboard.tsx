@@ -176,11 +176,8 @@ export default function Dashboard() {
     socket.on("weatherSeasonChartData", (data: WeatherSeasonData[]) => {
       setWeatherSeasonData(data);
     });
-    socket.on("job:completed", () => {
-      console.log("job compleleted");
-    });
+    socket.on("job:completed", () => {});
     socket.on("progress", (data: ProgressResponse) => {
-      console.log(data.progress);
       setUploadingProgress(parseInt(data.progress));
     });
 
@@ -239,10 +236,10 @@ export default function Dashboard() {
 
   return (
     <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
-      <div className="bg-white rounded-xl p-8 shadow-lg flex  justify-between items-center">
-        <h1 className="text-3xl "> Dashboard</h1>
+      <div className="bg-white rounded-xl  p-6 md:p-8 shadow-lg flex  justify-between items-center">
+        <h1 className="text-xl md:text-3xl "> Dashboard</h1>
 
-        <label className="flex items-center gap-2 px-6 py-4 bg-blue-500  text-white rounded-lg hover:bg-blue-700 cursor-pointer">
+        <label className="flex items-center   px-4 md:px-6 py-2 md:py-4 bg-blue-500  text-white rounded-lg hover:bg-blue-700 cursor-pointer">
           {isUploading ? (
             <div className="w-20 flex flex-col justify-between items-center">
               <SpinnerManager isLoading={true} />
@@ -273,7 +270,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid  grid-cols-1 md:grid-cols-2 gap-4">
         <MetricCard
           title="Temperature"
           value={`${Math.round(Number(weatherData[0]?.temperature_2m))}°C`}
@@ -299,9 +296,9 @@ export default function Dashboard() {
           color="#8E44AD"
         />
       </div>
-      <div className="bg-white p-12 rounded-xl shadow-lg ">
-        <h1 className="text-3xl "> Filters</h1>
-        <div className="flex items-center gap-4">
+      <div className="bg-white p-6 rounded-xl shadow-lg ">
+        <h1 className="text-3xl  "> Filters</h1>
+        <div className="flex mt-2  flex-col md:flex-row gap-4">
           <div className="flex flex-col">
             <label className="text-sm text-gray-500">From</label>
             <input
