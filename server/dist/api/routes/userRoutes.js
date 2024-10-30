@@ -2,6 +2,6 @@ import express from 'express';
 import multer from 'multer';
 const router = express.Router();
 const upload = multer();
-const { registerUser, loginUser } = require('../controllers/userController');
+import { loginUser } from '../controllers/userController.js';
 router.post('/login', upload.none(), loginUser);
 export default router;

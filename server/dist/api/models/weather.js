@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const weatherDataSchema = new mongoose.Schema({
     createdAt: {
         type: Date,

@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 export var UserRoles;
 (function (UserRoles) {
     UserRoles["USER"] = "USER";
     UserRoles["ADMIN"] = "ADMIN";
     UserRoles["MANAGER"] = "MANAGER";
 })(UserRoles || (UserRoles = {}));
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,

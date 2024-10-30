@@ -1,4 +1,4 @@
-import User, { UserRoles } from '../../api/models/user';
+import User from '../../src/api/models/user';
 import connectDb from '../../src/db';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';

@@ -6,23 +6,22 @@ import mongoose, { FilterQuery, Query } from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import './workers/workers';
 import multer from 'multer';
 import { Server } from 'socket.io';
 import { CronJob } from 'cron';
 import http from 'http';
 
 import dayjs from 'dayjs';
-import userRoutes from 'api/routes/userRoutes.js';
-import connectDb from 'db.js';
-import { createWorker } from 'workers/workers.js';
-import fetchCloudCoverMonthlyData from 'utils/fetch-cloud-cover-monthly-data.js';
-import fetchMontlyTemperatureData from 'utils/fetch-montly-temperature-data.js';
-import fetchMonthlyHumidityData from 'utils/fetch-monthly-humidity-data.js';
-import WeatherData from 'api/models/weather.js';
-import verifyToken from 'api/middleware/auth.js';
-import { csvQueue, serverAdapter } from 'queues/queue.js';
-import fetchWeatherSeasonChart from 'utils/fetch-weather-season-chart-data.js';
+import userRoutes from './api/routes/userRoutes.js';
+import connectDb from './db.js';
+import { createWorker } from './workers/workers.js';
+import fetchCloudCoverMonthlyData from './utils/fetch-cloud-cover-monthly-data.js';
+import fetchMontlyTemperatureData from './utils/fetch-montly-temperature-data.js';
+import fetchMonthlyHumidityData from './utils/fetch-monthly-humidity-data.js';
+import { csvQueue, serverAdapter } from './queues/queue.js';
+import fetchWeatherSeasonChart from './utils/fetch-weather-season-chart-data.js';
+import WeatherData from './api/models/weather.js';
+import verifyToken from './api/middleware/auth.js';
 
 export enum TimeFrame {
   DAILY = 'DAILY',
@@ -53,6 +52,11 @@ app.use(
 const port = 5001;
 
 app.set('view engine', 'ejs');
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.json());

@@ -1,8 +1,8 @@
-import WeatherData from 'api/models/weather.js';
+import WeatherData from '../api/models/weather.js';
 import { Worker, Job } from 'bullmq';
 import csvParser from 'csv-parser';
 import fs from 'fs';
-import redisConnection from 'queues/redis.js';
+import redisConnection from '../queues/redis.js';
 
 let skipRows = 4;
 export function createWorker(io: any) {

@@ -6,7 +6,7 @@ const upload = multer();
 import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 
-const { registerUser, loginUser } = require('../controllers/userController');
+import { registerUser, loginUser } from '../controllers/userController.js';
 
 declare global {
   namespace Express {

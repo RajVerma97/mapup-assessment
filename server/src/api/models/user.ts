@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 export enum UserRoles {
   USER = 'USER',
@@ -6,7 +6,7 @@ export enum UserRoles {
   MANAGER = 'MANAGER',
 }
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
