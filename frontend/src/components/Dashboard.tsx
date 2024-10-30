@@ -152,6 +152,7 @@ export default function Dashboard() {
           socket?.emit("fetchMonthlyHumidityData");
           socket?.emit("fetchWeatherSeasonChartData");
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error("Error fetching data:", error);
         }
       }
