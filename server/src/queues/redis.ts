@@ -3,14 +3,17 @@ import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const redisHost = process.env.REDIS_HOST ;
-const redisPort = process.env.REDIS_PORT
-  ? parseInt(process.env.REDIS_PORT, 10)
+const redisHost = process.env.REDISHOST;
+const redisPort = process.env.REDISPORT
+  ? parseInt(process.env.REDISPORT, 10)
   : 6379;
+
+const redisPassword = process.env.REDISPASSWORD || undefined;
 
 const redisConnection = new Redis({
   host: redisHost,
   port: redisPort,
+  password: redisPassword,
   maxRetriesPerRequest: null,
 });
 
