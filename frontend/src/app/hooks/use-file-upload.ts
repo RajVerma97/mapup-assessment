@@ -2,7 +2,7 @@ import fileUpload from "@/queries/file-upload";
 import useAuthenticatedMutation from "./use-authenticated-mutation";
 import { AxiosError } from "axios";
 import { ErrorResponse } from "@/types/error-response";
-import { FileUploadAuthResponse } from "@/components/Dashboard";
+import { FileUploadAuthResponse } from "@/types/dashboard";
 
 export default function useFileUploadMutation(options?: {
   onSuccess?: (data: FileUploadAuthResponse) => void;
