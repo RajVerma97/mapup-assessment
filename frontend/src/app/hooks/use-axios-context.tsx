@@ -13,8 +13,7 @@ interface AxiosProviderProps {
 // Provide Axios instance through context
 export function AxiosProvider({ children }: AxiosProviderProps) {
   const axiosInstance = axios.create({
-    baseURL: "https://localhost:3000",
-    // You can add headers or other configuration here
+    baseURL: process.env.NEXT_PUBLIC_BACKEND,
   });
 
   return (
