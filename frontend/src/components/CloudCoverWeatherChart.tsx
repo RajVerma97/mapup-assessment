@@ -10,6 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useMediaQuery } from "react-responsive";
 
 interface CloudCoverWeatherChartProps {
   data: CloudCoverData[];
@@ -18,9 +19,15 @@ interface CloudCoverWeatherChartProps {
 export default function CloudCoverWeatherChart({
   data,
 }: CloudCoverWeatherChartProps) {
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   return (
     <ResponsiveContainer width="100%" height={400}>
-      <BarChart width={700} height={400} data={data} margin={{ top: 20 }}>
+      <BarChart
+        width={isMobile ? 400 : 700}
+        height={isMobile ? 200 : 350}
+        data={data}
+        margin={{ top: 20 }}
+      >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="month" />
         <YAxis />

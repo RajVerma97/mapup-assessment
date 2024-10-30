@@ -331,7 +331,7 @@ export default function Dashboard() {
       <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
         <CloudCoverWeatherChart data={cloudCoverData} />
       </div>
-      <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-between items-center gap-4 text-center overflow-hidden  ">
+      <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex flex-col md:flex-row  justify-between items-center gap-4 text-center overflow-hidden  ">
         <MonthlyAverageTemperatureChart data={monthlyTemperatureData} />
         <AvgHumidityChart data={monthlyHumidityData} />
       </div>

@@ -9,7 +9,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { MonthlyTemperatureData } from "./Dashboard";
+import { useMediaQuery } from "react-responsive";
+import { MonthlyTemperatureData } from "@/types/dashboard";
 
 interface MonthlyTemperatureChartProps {
   data: MonthlyTemperatureData[];
@@ -18,9 +19,15 @@ interface MonthlyTemperatureChartProps {
 const MonthlyAverageTemperatureChart = ({
   data,
 }: MonthlyTemperatureChartProps) => {
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <BarChart data={data} width={350} height={400} margin={{ top: 20 }}>
+    <ResponsiveContainer width="100%" height={"100%"}>
+      <BarChart
+        data={data}
+        width={isMobile ? 250 : 350}
+        height={isMobile ? 200 : 400}
+        margin={{ top: 20 }}
+      >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="monthName" />
         <YAxis />
