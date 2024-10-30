@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "nodemon --exec ts-node src/app.ts",
+    "dev": "nodemon --watch src -e ts,json --exec \"tsx src/app.ts\"",
     "build:start": "rm -rf dist/ && tsc -p tsconfig.json && node -r dotenv/config dist/app.js",
     "tsc": "tsc -p tsconfig.json",
     "live": "live-server public",
@@ -53,11 +53,14 @@
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/multer": "^1.4.12",
+    "chokidar": "^4.0.1",
     "eslint": "^9.13.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.11.0",
     "live-server": "^1.2.2",
-    "ts-node": "^10.9.2"
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2"
   }
 }
