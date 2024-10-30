@@ -71,10 +71,8 @@ createWorker(io);
 
 io.on('connection', (socket) => {
   socket.on('fetchCloudCoverData', async () => {
-    // console.log('Received request for cloud cover data');
     try {
       const cloudCoverData = await fetchCloudCoverMonthlyData();
-      // console.log('Sending cloud cover data:', cloudCoverData);
       socket.emit('cloudCoverData', cloudCoverData);
     } catch (error) {
       console.error('Error fetching cloud cover data:', error);
@@ -82,11 +80,9 @@ io.on('connection', (socket) => {
     }
   });
   socket.on('fetchMonthlyTemperatureData', async () => {
-    // console.log('Received request for monthly temperature data');
     try {
       const monthlyTemperatureData = await fetchMontlyTemperatureData();
 
-      // console.log('Sending monthly temperature data:', monthlyTemperatureData);
       socket.emit('monthlyTemperatureData', monthlyTemperatureData);
     } catch (error) {
       console.error('Error fetching monthly temperature data:', error);
@@ -96,11 +92,9 @@ io.on('connection', (socket) => {
     }
   });
   socket.on('fetchMonthlyHumidityData', async () => {
-    // console.log('Received request for monthly temperature data');
     try {
       const monthlyHumidityData = await fetchMonthlyHumidityData();
 
-      // console.log('Sending monthly humidity data:', monthlyHumidityData);
       socket.emit('monthlyHumidityData', monthlyHumidityData);
     } catch (error) {
       console.error('Error fetching monthly humidity data:', error);
@@ -124,11 +118,9 @@ io.on('connection', (socket) => {
 
   socket.on('fetchData', async (params: WeatherDataParams) => {
     const { page = 1, limit = 10, dateFrom, dateTo, sort } = params;
-    // console.log('params', params);
 
     try {
       const totalCount = await WeatherData.countDocuments();
-      // console.log('Total documents:', totalCount);
 
       const query: any = {};
 
@@ -146,12 +138,6 @@ io.on('connection', (socket) => {
         .limit(limit)
         .lean()
         .exec();
-
-      // console.log(`Returned ${data.length} documents`);
-      if (data.length > 0) {
-        // console.log('First document time:', data[0].time);
-        // console.log('Last document time:', data[data.length - 1].time);
-      }
 
       socket.emit('data', {
         data,
