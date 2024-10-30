@@ -22,45 +22,51 @@ import { csvQueue, serverAdapter } from './queues/queue.js';
 import fetchWeatherSeasonChart from './utils/fetch-weather-season-chart-data.js';
 import WeatherData from './api/models/weather.js';
 import verifyToken from './api/middleware/auth.js';
-
-export enum TimeFrame {
-  DAILY = 'DAILY',
-  WEEKLY = 'WEEKLY',
-  MONTHLY = 'MONTHLY',
-  YEARLY = 'YEARLY',
-}
-
-export interface WeatherDataParams {
-  page: number;
-  limit: number;
-  filter: string;
-  sort: string;
-  timeFrame: TimeFrame;
-  dateFrom: string;
-  dateTo: string;
-}
+import { WeatherDataParams } from './types/dashboard.js';
 
 dotenv.config();
 
 const app = express();
 const httpServer = http.createServer(app);
+
+const allowedOrigins: string[] = [
+  process.env.FRONTEND_URL || '',
+  'http://localhost:3000',
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true,
   })
 );
-const port = process.env.PORT || 5001;
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(bodyParser.json());
+const port = process.env.PORT || 5001;
 
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, success?: boolean) => void
+    ) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true,
   },
   transports: ['websocket', 'polling'],
+});
+
+io.engine.on('connection_error', (err) => {
+  console.log('Connection error:', err);
 });
 
 createWorker(io);

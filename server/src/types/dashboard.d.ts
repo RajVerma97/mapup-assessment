@@ -11,4 +11,6 @@ export interface WeatherDataParams {
   filter: string;
   sort: string;
   timeFrame: TimeFrame;
-};
+  dateFrom: string;
+  dateTo: string;
+}
