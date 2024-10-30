@@ -101,7 +101,7 @@ export default function Dashboard() {
   };
 
   const [page] = useState(1);
-  const [limit] = useState(300);
+  const [limit] = useState(500);
   const [filter] = useState("");
   const [sort] = useState("asc");
 
@@ -242,28 +242,6 @@ export default function Dashboard() {
       <div className="bg-white rounded-xl p-8 shadow-lg flex  justify-between items-center">
         <h1 className="text-3xl "> Dashboard</h1>
 
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col">
-            <label className="text-sm text-gray-500">From</label>
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <label className="text-sm text-gray-500">To</label>
-            <input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            />
-          </div>
-        </div>
-
         <label className="flex items-center gap-2 px-6 py-4 bg-blue-500  text-white rounded-lg hover:bg-blue-700 cursor-pointer">
           {isUploading ? (
             <div className="w-20 flex flex-col justify-between items-center">
@@ -281,12 +259,6 @@ export default function Dashboard() {
                 accept=".csv"
                 className="hidden"
                 onChange={handleUpload}
-                onClick={(e) => {
-                  if (isUploading) {
-                    e.preventDefault(); // Prevent default behavior
-                    e.stopPropagation(); // Pr
-                  }
-                }}
               />
             </div>
           )}
@@ -327,15 +299,29 @@ export default function Dashboard() {
           color="#8E44AD"
         />
       </div>
-      <div className="bg-white p-12 rounded-xl shadow-lg text-center">
-        <Upload size={48} className="mx-auto mb-4 text-gray-400" />
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          Upload Your Weather Data
-        </h3>
-        <p className="text-gray-600">
-          Upload a CSV file with date, temperature, pressure, humidity, and wind
-          speed columns
-        </p>
+      <div className="bg-white p-12 rounded-xl shadow-lg ">
+        <h1 className="text-3xl "> Filters</h1>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <label className="text-sm text-gray-500">From</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm text-gray-500">To</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            />
+          </div>
+        </div>
       </div>
 
       <div className=" w-full   bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
