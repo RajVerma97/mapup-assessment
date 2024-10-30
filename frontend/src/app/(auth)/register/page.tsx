@@ -8,10 +8,7 @@ import { RegisterAuthResponse, RegisterUserData } from "@/types/register-user";
 import { AxiosError } from "axios";
 import { ErrorResponse } from "@/types/error-response";
 
-interface RegisterProps {
-  setPath: React.Dispatch<React.SetStateAction<string>>;
-}
-export default function Register({}: RegisterProps) {
+export default function Register() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
