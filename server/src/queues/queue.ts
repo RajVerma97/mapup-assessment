@@ -1,4 +1,3 @@
-// queues/queue.ts
 import { Queue } from 'bullmq';
 import { ExpressAdapter } from '@bull-board/express';
 import { createBullBoard } from '@bull-board/api';

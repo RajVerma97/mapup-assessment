@@ -1,3 +1,4 @@
+import { WeatherSeasonData } from "@/types/dashboard";
 import React from "react";
 import {
   BarChart,
@@ -8,8 +9,6 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-
-import { WeatherSeasonData } from "./Dashboard";
 
 interface WeatherSeasonChartProps {
   data: WeatherSeasonData[];
@@ -32,6 +31,7 @@ export default function WeatherSeasonChart({ data }: WeatherSeasonChartProps) {
         tickFormatter={(str) =>
           str
             .split(" ")
+            // @ts-expect-error remove
             .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
             .join(" ")
         }
