@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     domains: ["cdn.marvel.com", "img.freepik.com"],
   },
   async rewrites() {
+    // eslint-disable-next-line no-console
+    console.log("gola " + process.env.NEXT_PUBLIC_BACKEND);
     return [
       {
         source: "/socket.io/:path*",
