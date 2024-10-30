@@ -1,8 +1,14 @@
-import { BarChart2, Droplet, Thermometer, Upload, Wind } from "lucide-react";
+import {
+  BarChart2,
+  Droplet,
+  Pause,
+  Thermometer,
+  Upload,
+  Wind,
+} from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import MonthlyAverageTemperatureChart from "./MonthlyTemperatureChart";
 import AvgHumidityChart from "./AvgHumidityChart";
-import { motion } from "framer-motion";
 import useFileUploadMutation from "@/app/hooks/use-file-upload";
 import { notify, ToastManager } from "./ToastManager";
 import { WeatherData, WeatherDataList } from "@/types/weather-data";
@@ -23,70 +29,44 @@ import {
   WindSpeedDirectionData,
 } from "@/types/dashboard";
 import { TimeFrame } from "@/enums/dashboard";
+import MetricCard from "./MetricCard";
+import Loading from "./Loading";
+import SpinnerManager from "./SpinnerManager";
 
 const WeatherChart = dynamic(() => import("./WeatherChart"), {
   ssr: false,
-  loading: () => <p>Loading...</p>,
+  loading: () => <Loading isLoading={true} />,
 });
 
 const CloudCoverWeatherChart = dynamic(
   () => import("./CloudCoverWeatherChart"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <Loading isLoading={true} />,
   }
 );
 const WindSpeedDirectionChart = dynamic(
   () => import("./WindSpeedDirectionChart"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <Loading isLoading={true} />,
   }
 );
 
 const WeatherSeasonChart = dynamic(() => import("./WeatherSeasonChart"), {
   ssr: false,
-  loading: () => <p>Loading...</p>,
+  loading: () => <Loading isLoading={true} />,
 });
 
 const DailyWeatherChart = dynamic(() => import("./WeatherDataPieChart"), {
   ssr: false,
-  loading: () => <p>Loading...</p>,
+  loading: () => <Loading isLoading={true} />,
 });
 
-interface MetricCardProps {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-  color?: string;
+interface ProgressResponse {
+  jobId: string;
+  progress: string;
 }
-
-const MetricCard = ({
-  title,
-  value,
-  icon,
-  color = "#000",
-}: MetricCardProps) => (
-  <motion.div
-    initial={{ scale: 1 }}
-    whileHover={{ scale: 1.02 }}
-    transition={{ duration: 0.1 }}
-    className="bg-white rounded-xl p-6 shadow-lg"
-  >
-    <div className="flex items-center gap-4">
-      <div
-        className="p-3 rounded-lg bg-opacity-10"
-        style={{ backgroundColor: `${color}20` }}
-      >
-        {icon}
-      </div>
-      <div>
-        <p className="text-sm text-gray-600">{title}</p>
-        <p className="text-2xl font-semibold">{value}</p>
-      </div>
-    </div>
-  </motion.div>
-);
 
 export default function Dashboard() {
   const fileUploadMutation = useFileUploadMutation({
@@ -102,11 +82,15 @@ export default function Dashboard() {
         message: errorMessage || "Something went wrong",
         status: "error",
       });
+      setIsUploading(false);
+      setUploadingProgress(0);
     },
   });
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
+    setIsUploading(true);
+    setUploadingProgress(0);
     const file = e.target.files?.[0];
 
     if (file) {
@@ -116,11 +100,14 @@ export default function Dashboard() {
     }
   };
 
-  const [weatherData, setWeatherData] = useState<WeatherDataList>([]);
   const [page] = useState(1);
   const [limit] = useState(300);
   const [filter] = useState("");
   const [sort] = useState("asc");
+
+  const [weatherData, setWeatherData] = useState<WeatherDataList>([]);
+  const [isWeatherDataLoading, setIsWeatherDataLoading] =
+    useState<boolean>(false);
   const [cloudCoverData, setCloudCoverData] = useState<CloudCoverData[]>([]);
   const [monthlyTemperatureData, setMonthlyTemperatureData] = useState<
     MonthlyTemperatureData[]
@@ -134,11 +121,21 @@ export default function Dashboard() {
 
   const [timeFrame] = useState<TimeFrame>(TimeFrame.YEARLY);
 
-  const [dateFrom, setDateFrom] = useState("2022-01-01T00:00");
-  const [dateTo, setDateTo] = useState("2022-01-09T05:00");
+  const [dateFrom, setDateFrom] = useState("2022-01-01");
+  const [dateTo, setDateTo] = useState("2022-01-09");
+
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadingProgress, setUploadingProgress] = useState<number>(4);
+
+  useEffect(() => {
+    if (uploadingProgress === 100) {
+      setIsUploading(false);
+    }
+  }, [uploadingProgress]);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsWeatherDataLoading(true);
       if (socket) {
         try {
           socket?.emit("fetchData", {
@@ -160,10 +157,9 @@ export default function Dashboard() {
       }
     };
 
-    socket.on("data", (data: WeatherDataList) => {
-      console.log("data");
-      console.log(data);
-      setWeatherData(data.data);
+    socket.on("data", (response) => {
+      setWeatherData(response.data);
+      setIsWeatherDataLoading(false);
     });
 
     socket.on("cloudCoverData", (data: CloudCoverData[]) => {
@@ -180,6 +176,13 @@ export default function Dashboard() {
     socket.on("weatherSeasonChartData", (data: WeatherSeasonData[]) => {
       setWeatherSeasonData(data);
     });
+    socket.on("job:completed", () => {
+      console.log("job compleleted");
+    });
+    socket.on("progress", (data: ProgressResponse) => {
+      console.log(data.progress);
+      setUploadingProgress(parseInt(data.progress));
+    });
 
     fetchData();
 
@@ -191,7 +194,17 @@ export default function Dashboard() {
       socket.off("monthlyHumidityData");
       socket.off("weatherSeasonChartData");
     };
-  });
+  }, [
+    page,
+    limit,
+    dateFrom,
+    dateTo,
+    timeFrame,
+    isUploading,
+    filter,
+    sort,
+    uploadingProgress,
+  ]);
 
   const weatherChartData: WeatherChartData[] = weatherData?.map(
     (item: WeatherData) => ({
@@ -218,6 +231,11 @@ export default function Dashboard() {
       avgSnowfall: item?.avgSnowfall || 0,
     }));
   }, [weatherSeasonData]);
+
+  const handleCancelUpload = () => {
+    setIsUploading(false);
+    setUploadingProgress(0);
+  };
 
   return (
     <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
@@ -246,18 +264,41 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 px-6 py-4 bg-green-500  text-white rounded-lg hover:bg-green-700 cursor-pointer">
-            <Upload size={30} color="white" />
-            <span>Upload CSV</span>
-            <input
-              type="file"
-              accept=".csv"
-              className="hidden"
-              onChange={handleUpload}
-            />
-          </label>
-        </div>
+        <label className="flex items-center gap-2 px-6 py-4 bg-blue-500  text-white rounded-lg hover:bg-blue-700 cursor-pointer">
+          {isUploading ? (
+            <div className="w-20 flex flex-col justify-between items-center">
+              <SpinnerManager isLoading={true} />
+              <p className="text-center text-md text-white">
+                {uploadingProgress}%
+              </p>
+            </div>
+          ) : (
+            <div className="w-32 flex  justify-between items-center">
+              <Upload size={30} color="white" />
+              <span>Upload CSV</span>
+              <input
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={handleUpload}
+                onClick={(e) => {
+                  if (isUploading) {
+                    e.preventDefault(); // Prevent default behavior
+                    e.stopPropagation(); // Pr
+                  }
+                }}
+              />
+            </div>
+          )}
+        </label>
+        {isUploading && (
+          <button
+            className="flex items-center justify-center p-2 border-2 text-black rounded-md hover:scale-105  transition duration-200 ease-in-out"
+            onClick={handleCancelUpload}
+          >
+            <Pause size={40} className="mr-2" />
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -298,7 +339,11 @@ export default function Dashboard() {
       </div>
 
       <div className=" w-full   bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
-        <WeatherChart data={weatherChartData} />
+        {isWeatherDataLoading ? (
+          <Loading isLoading={isWeatherDataLoading} />
+        ) : (
+          <WeatherChart data={weatherChartData} />
+        )}
       </div>
       <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
         <CloudCoverWeatherChart data={cloudCoverData} />

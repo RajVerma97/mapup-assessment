@@ -6,10 +6,8 @@ import { Request, Response } from 'express';
 import mongoose, { FilterQuery, Query } from 'mongoose';
 import dotenv from 'dotenv';
 import connectDb from './db';
-//import verifyToken from '../api/middleware/auth';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-//import { csvQueue, serverAdapter } from '../queues/queue';
 import './workers/workers';
 import multer from 'multer';
 import { Server } from 'socket.io';
@@ -24,6 +22,7 @@ import fetchCloudCoverMonthlyData from './utils/fetch-cloud-cover-monthly-data';
 import fetchWeatherSeasonData from './utils/fetch-weather-season-chart-data';
 import verifyToken from './api/middleware/auth';
 import { csvQueue, serverAdapter } from './queues/queue';
+import { createWorker } from './workers/workers';
 
 export enum TimeFrame {
   DAILY = 'DAILY',
@@ -68,6 +67,8 @@ const io = new Server(httpServer, {
   transports: ['websocket', 'polling'],
 });
 
+createWorker(io);
+
 io.on('connection', (socket) => {
   socket.on('fetchCloudCoverData', async () => {
     // console.log('Received request for cloud cover data');
@@ -109,11 +110,9 @@ io.on('connection', (socket) => {
     }
   });
   socket.on('fetchWeatherSeasonChartData', async () => {
-    // console.log('Received request for monthly temperature data');
     try {
       const weatherSeasonChartData = await fetchWeatherSeasonData();
 
-      // console.log('Sending weather season  data:', weatherSeasonChartData);
       socket.emit('weatherSeasonChartData', weatherSeasonChartData);
     } catch (error) {
       console.error('Error fetching monthly humidity data:', error);
@@ -125,32 +124,22 @@ io.on('connection', (socket) => {
 
   socket.on('fetchData', async (params: WeatherDataParams) => {
     const { page = 1, limit = 10, dateFrom, dateTo, sort } = params;
-    console.log('params', params);
-
-    
+    // console.log('params', params);
 
     try {
-      // Calculate total before any filtering
       const totalCount = await WeatherData.countDocuments();
-      console.log('Total documents:', totalCount);
+      // console.log('Total documents:', totalCount);
 
-      // Build query based on provided date range or use defaults
       const query: any = {};
 
-      // Only add time filter if dates are provided
       if (dateFrom || dateTo) {
         query.time = {};
         if (dateFrom) query.time.$gte = dateFrom;
         if (dateTo) query.time.$lte = dateTo;
       }
 
-      // console.log('Query filter:', JSON.stringify(query, null, 2));
-
-      // Get filtered count
       const filteredCount = await WeatherData.countDocuments(query);
-      // console.log('Filtered count:', filteredCount);
 
-      // Execute query with pagination
       const data = await WeatherData.find(query)
         .sort({ time: sort === 'desc' ? -1 : 1 })
         .skip((page - 1) * limit)
@@ -158,13 +147,12 @@ io.on('connection', (socket) => {
         .lean()
         .exec();
 
-      console.log(`Returned ${data.length} documents`);
+      // console.log(`Returned ${data.length} documents`);
       if (data.length > 0) {
-        console.log('First document time:', data[0].time);
-        console.log('Last document time:', data[data.length - 1].time);
+        // console.log('First document time:', data[0].time);
+        // console.log('Last document time:', data[data.length - 1].time);
       }
 
-      // Send response with pagination metadata
       socket.emit('data', {
         data,
         pagination: {
@@ -198,20 +186,24 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.get('/protected', verifyToken, (req: Request, res: Response) => {
-  console.log('procted route');
   res.status(200).json({ message: 'Protected route Accessed  Successfully' });
 });
 
-app.post('/upload', upload.single('file'), (req: Request, res: Response) => {
-  const filePath = req.file!.path;
+app.post(
+  '/upload',
+  upload.single('file'),
+  async (req: Request, res: Response) => {
+    const filePath = req.file!.path;
 
-  try {
-    csvQueue.add('csv-job', { filePath });
-    res.status(200).json({ message: 'File uploaded successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error uploading file' });
+    try {
+      const job = csvQueue.add('csv-job', { filePath });
+      console.log('job', job);
+      res.status(200).json({ message: 'File upload started!' });
+    } catch (error) {
+      res.status(500).json({ message: 'Error uploading file' });
+    }
   }
-});
+);
 
 app.use('/admin/queues', serverAdapter.getRouter());
 
