@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2016",
+    "target": "es6",
     "module": "commonjs",
     "lib": ["es2016", "dom"],
     "strict": true,
@@ -9,9 +9,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "/",
-    "typeRoots": ["./node_modules/@types"]
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "paths": {
+      "@types/*": ["types/*"]
+    }
   },
-  "include": ["*.ts", "api/**/*.ts", "workers/workers.ts"],
+  "include": ["src/**/*.ts",  "./workers/workers.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

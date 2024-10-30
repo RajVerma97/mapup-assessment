@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node app.ts",
-    "dev": "nodemon --exec ts-node app.ts",
+    "start": "node src/app.ts",
+    "dev": "nodemon --exec ts-node src/app.ts",
     "live": "live-server public",
     "lint": "eslint .",
     "lint:fix": "eslint .  --fix .",
@@ -24,6 +24,7 @@
     "cors": "^2.8.5",
     "cron": "^3.1.7",
     "csv-parser": "^3.0.0",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.1",

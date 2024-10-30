@@ -22,6 +22,7 @@ import {
   WeatherSeasonData,
   WindSpeedDirectionData,
 } from "@/types/dashboard";
+import { TimeFrame } from "@/enums/dashboard";
 
 const WeatherChart = dynamic(() => import("./WeatherChart"), {
   ssr: false,
@@ -117,7 +118,7 @@ export default function Dashboard() {
 
   const [weatherData, setWeatherData] = useState<WeatherDataList>([]);
   const [page] = useState(1);
-  const [limit] = useState(100);
+  const [limit] = useState(300);
   const [filter] = useState("");
   const [sort] = useState("asc");
   const [cloudCoverData, setCloudCoverData] = useState<CloudCoverData[]>([]);
@@ -131,11 +132,24 @@ export default function Dashboard() {
     WeatherSeasonData[]
   >([]);
 
+  const [timeFrame] = useState<TimeFrame>(TimeFrame.YEARLY);
+
+  const [dateFrom, setDateFrom] = useState("2022-01-01T00:00");
+  const [dateTo, setDateTo] = useState("2022-01-09T05:00");
+
   useEffect(() => {
     const fetchData = async () => {
       if (socket) {
         try {
-          socket?.emit("fetchData", { page, limit, filter, sort });
+          socket?.emit("fetchData", {
+            page,
+            limit,
+            filter,
+            sort,
+            timeFrame,
+            dateFrom,
+            dateTo,
+          });
           socket?.emit("fetchCloudCoverData");
           socket?.emit("fetchMonthlyTemperatureData");
           socket?.emit("fetchMonthlyHumidityData");
@@ -147,7 +161,9 @@ export default function Dashboard() {
     };
 
     socket.on("data", (data: WeatherDataList) => {
-      setWeatherData(data);
+      console.log("data");
+      console.log(data);
+      setWeatherData(data.data);
     });
 
     socket.on("cloudCoverData", (data: CloudCoverData[]) => {
@@ -207,6 +223,28 @@ export default function Dashboard() {
     <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
       <div className="bg-white rounded-xl p-8 shadow-lg flex  justify-between items-center">
         <h1 className="text-3xl "> Dashboard</h1>
+
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <label className="text-sm text-gray-500">From</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm text-gray-500">To</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            />
+          </div>
+        </div>
 
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 px-6 py-4 bg-green-500  text-white rounded-lg hover:bg-green-700 cursor-pointer">

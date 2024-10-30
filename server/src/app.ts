@@ -3,23 +3,44 @@ import path from 'path';
 import userRoutes from './api/routes/userRoutes';
 
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery, Query } from 'mongoose';
 import dotenv from 'dotenv';
 import connectDb from './db';
-import verifyToken from './api/middleware/auth';
+//import verifyToken from '../api/middleware/auth';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { csvQueue, serverAdapter } from './queues/queue';
+//import { csvQueue, serverAdapter } from '../queues/queue';
 import './workers/workers';
 import multer from 'multer';
-import WeatherData from './api/models/weather';
 import { Server } from 'socket.io';
 import { CronJob } from 'cron';
 import http from 'http';
-import fetchCloudCoverMonthlyData from './utils/fetch-cloud-cover-monthly-data';
+
+import dayjs from 'dayjs';
 import fetchMontlyTemperatureData from './utils/fetch-montly-temperature-data';
 import fetchMonthlyHumidityData from './utils/fetch-monthly-humidity-data';
+import WeatherData from './api/models/weather';
+import fetchCloudCoverMonthlyData from './utils/fetch-cloud-cover-monthly-data';
 import fetchWeatherSeasonData from './utils/fetch-weather-season-chart-data';
+import verifyToken from './api/middleware/auth';
+import { csvQueue, serverAdapter } from './queues/queue';
+
+export enum TimeFrame {
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  YEARLY = 'YEARLY',
+}
+
+export interface WeatherDataParams {
+  page: number;
+  limit: number;
+  filter: string;
+  sort: string;
+  timeFrame: TimeFrame;
+  dateFrom: string;
+  dateTo: string;
+}
 
 dotenv.config();
 
@@ -102,33 +123,65 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('fetchData', async (params) => {
-    // console.log('Received request for data with params:', params);
-    const { page, limit, filter, sort } = params;
+  socket.on('fetchData', async (params: WeatherDataParams) => {
+    const { page = 1, limit = 10, dateFrom, dateTo, sort } = params;
+    console.log('params', params);
+
+    
 
     try {
-      const query = WeatherData.find();
+      // Calculate total before any filtering
+      const totalCount = await WeatherData.countDocuments();
+      console.log('Total documents:', totalCount);
 
-      if (filter) {
-        query.where('field_to_filter').equals(filter);
+      // Build query based on provided date range or use defaults
+      const query: any = {};
+
+      // Only add time filter if dates are provided
+      if (dateFrom || dateTo) {
+        query.time = {};
+        if (dateFrom) query.time.$gte = dateFrom;
+        if (dateTo) query.time.$lte = dateTo;
       }
 
-      if (sort) {
-        query.sort({ createdAt: sort === 'asc' ? 1 : -1 });
-      }
+      // console.log('Query filter:', JSON.stringify(query, null, 2));
 
-      const data = await query
+      // Get filtered count
+      const filteredCount = await WeatherData.countDocuments(query);
+      // console.log('Filtered count:', filteredCount);
+
+      // Execute query with pagination
+      const data = await WeatherData.find(query)
+        .sort({ time: sort === 'desc' ? -1 : 1 })
         .skip((page - 1) * limit)
         .limit(limit)
+        .lean()
         .exec();
 
-      socket.emit('data', data);
+      console.log(`Returned ${data.length} documents`);
+      if (data.length > 0) {
+        console.log('First document time:', data[0].time);
+        console.log('Last document time:', data[data.length - 1].time);
+      }
+
+      // Send response with pagination metadata
+      socket.emit('data', {
+        data,
+        pagination: {
+          total: filteredCount,
+          page,
+          limit,
+          pages: Math.ceil(filteredCount / limit),
+        },
+      });
     } catch (error) {
       console.error('Error fetching data:', error);
-      socket.emit('error', { message: 'Failed to fetch data' });
+      socket.emit('error', {
+        message: 'Failed to fetch data',
+        error: (error as Error).message,
+      });
     }
   });
-
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });

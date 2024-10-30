@@ -1,5 +1,5 @@
 import User, { UserRoles } from '../../api/models/user';
-import connectDb from '../../db';
+import connectDb from '../../src/db';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 
