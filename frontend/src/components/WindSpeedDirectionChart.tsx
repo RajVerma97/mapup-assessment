@@ -63,7 +63,8 @@ export default function WindSpeedDirectionChart({
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => {
+          label: (context: never) => {
+            // @ts-expect-error remove
             return `Direction: ${context.raw.x}°, Speed: ${context.raw.y} m/s`;
           },
         },

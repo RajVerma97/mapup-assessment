@@ -11,7 +11,7 @@ import { ErrorResponse } from "@/types/error-response";
 interface RegisterProps {
   setPath: React.Dispatch<React.SetStateAction<string>>;
 }
-export default function Register({ setPath }: RegisterProps) {
+export default function Register({}: RegisterProps) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [userName, setUserName] = useState<string>("");

@@ -53,28 +53,30 @@ export default function Sidebar({ className, setPath }: SidebarProps) {
       path: "/dashboard",
       icon: <HomeIcon className="text-black" />,
     },
-    {
-      name: "Register",
-      path: "/register",
-      icon: <User className="text-black" />,
-    },
-    {
-      name: "Login",
-      path: "/login",
-      icon: <LogInIcon className="text-black" />,
-    },
-    // {
-    //   name: "Github",
-    //   path: "https://github.com/RajVerma97/mapup-assessment",
-    //   icon: <Github className="text-black" />,
-    // },
-    {
-      name: "Logout",
-      path: "", // Empty path for logout
-      onClick: handleLogout,
-      icon: <LogOut className="text-red-500" />,
-    },
   ];
+
+  if (user) {
+    sideBarLinks.push({
+      name: "Logout",
+      path: "",
+      icon: <LogOut className="text-red-500" />,
+    });
+  }
+
+  if (!user) {
+    sideBarLinks.push(
+      {
+        name: "Register",
+        path: "/register",
+        icon: <User className="text-black" />,
+      },
+      {
+        name: "Login",
+        path: "/login",
+        icon: <LogInIcon className="text-black" />,
+      }
+    );
+  }
   const userProfileTypeImages: Record<string, string> = {
     ADMIN:
       "https://img.freepik.com/free-vector/admin-concept-illustration_114360-2139.jpg?uid=R80559136&semt=ais_hybrid",
@@ -85,8 +87,10 @@ export default function Sidebar({ className, setPath }: SidebarProps) {
       "https://img.freepik.com/free-vector/no-people-sign_78370-7014.jpg?uid=R80559136&semt=ais_hybrid",
   };
 
+  //@ts-expect-error remove
   const UserSrcImage = userProfileTypeImages[user?.role]
-    ? userProfileTypeImages[user?.role]
+    ? //@ts-expect-error remove
+      userProfileTypeImages[user?.role]
     : userProfileTypeImages.DEFAULT;
 
   return (
@@ -101,9 +105,11 @@ export default function Sidebar({ className, setPath }: SidebarProps) {
             className="aspect-square object-cover rounded-full"
           />
           <h1 className="text-2xl  text-black">
+            {/* @ts-expect-error remove */}
             {user ? user?.username : "No User"}
           </h1>
           <h4 className="text-xl  text-black">
+            {/* @ts-expect-error remove */}
             {user ? user?.role.toUpperCase() : "No Role"}
           </h4>
         </div>
