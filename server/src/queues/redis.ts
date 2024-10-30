@@ -9,6 +9,8 @@ const redisPort = process.env.REDISPORT
   : 6379;
 
 const redisPassword = process.env.REDISPASSWORD || undefined;
+console.log(` holaa!Connecting to Redis at ${redisHost}:${redisPort}`);
+
 
 const redisConnection = new Redis({
   host: redisHost,
