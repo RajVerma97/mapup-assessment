@@ -2,6 +2,7 @@
   "name": "mapup-assessment",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/app.ts",
     "dev": "nodemon --exec ts-node src/app.ts",

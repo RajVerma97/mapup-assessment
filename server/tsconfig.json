@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
+    "module": "ESNext",
     "lib": ["es2016", "dom"],
     "strict": true,
     "esModuleInterop": true,
@@ -15,6 +15,6 @@
       "@types/*": ["types/*"]
     }
   },
-  "include": ["src/**/*.ts",  "./workers/workers.ts"],
+  "include": ["src/**/*.ts", "./workers/workers.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
