@@ -1,4 +1,4 @@
-import WeatherData from '../api/models/weather';
+import WeatherData from 'api/models/weather.js';
 
 export default async function fetchCloudCoverMonthlyData() {
   return await WeatherData.aggregate([

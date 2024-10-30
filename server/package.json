@@ -2,9 +2,11 @@
   "name": "mapup-assessment",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/app.ts",
+    "start": "node dist/app.js",
     "dev": "nodemon --exec ts-node src/app.ts",
+    "build": "tsc",
     "live": "live-server public",
     "lint": "eslint .",
     "lint:fix": "eslint .  --fix .",
@@ -16,7 +18,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@bull-board/api": "^6.3.2",
     "@bull-board/express": "^6.3.1",
+    "@types/bull-board": "^2.0.4",
     "@types/socket.io": "^3.0.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",

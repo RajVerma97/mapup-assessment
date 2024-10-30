@@ -1,8 +1,8 @@
 import { Queue } from 'bullmq';
 import { ExpressAdapter } from '@bull-board/express';
 import { createBullBoard } from '@bull-board/api';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
-import redisConnection from './redis';
+import redisConnection from './redis.js';
+const { BullMQAdapter } = require('bull-board/bullMQAdapter');
 
 const csvQueue = new Queue('csv-processing', {
   connection: redisConnection,

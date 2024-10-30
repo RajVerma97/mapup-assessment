@@ -1,11 +1,9 @@
 import express from 'express';
 import path from 'path';
-import userRoutes from './api/routes/userRoutes';
 
 import { Request, Response } from 'express';
 import mongoose, { FilterQuery, Query } from 'mongoose';
 import dotenv from 'dotenv';
-import connectDb from './db';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import './workers/workers';
@@ -15,14 +13,16 @@ import { CronJob } from 'cron';
 import http from 'http';
 
 import dayjs from 'dayjs';
-import fetchMontlyTemperatureData from './utils/fetch-montly-temperature-data';
-import fetchMonthlyHumidityData from './utils/fetch-monthly-humidity-data';
-import WeatherData from './api/models/weather';
-import fetchCloudCoverMonthlyData from './utils/fetch-cloud-cover-monthly-data';
-import fetchWeatherSeasonData from './utils/fetch-weather-season-chart-data';
-import verifyToken from './api/middleware/auth';
-import { csvQueue, serverAdapter } from './queues/queue';
-import { createWorker } from './workers/workers';
+import userRoutes from 'api/routes/userRoutes.js';
+import connectDb from 'db.js';
+import { createWorker } from 'workers/workers.js';
+import fetchCloudCoverMonthlyData from 'utils/fetch-cloud-cover-monthly-data.js';
+import fetchMontlyTemperatureData from 'utils/fetch-montly-temperature-data.js';
+import fetchMonthlyHumidityData from 'utils/fetch-monthly-humidity-data.js';
+import WeatherData from 'api/models/weather.js';
+import verifyToken from 'api/middleware/auth.js';
+import { csvQueue, serverAdapter } from 'queues/queue.js';
+import fetchWeatherSeasonChart from 'utils/fetch-weather-season-chart-data.js';
 
 export enum TimeFrame {
   DAILY = 'DAILY',
@@ -105,7 +105,7 @@ io.on('connection', (socket) => {
   });
   socket.on('fetchWeatherSeasonChartData', async () => {
     try {
-      const weatherSeasonChartData = await fetchWeatherSeasonData();
+      const weatherSeasonChartData = await fetchWeatherSeasonChart();
 
       socket.emit('weatherSeasonChartData', weatherSeasonChartData);
     } catch (error) {
