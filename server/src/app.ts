@@ -46,10 +46,10 @@ const app = express();
 const httpServer = http.createServer(app);
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL,
   })
 );
-const port = 5001;
+const port = process.env.PORT || 5001;
 
 // app.set('view engine', 'ejs');
 // import { fileURLToPath } from 'url';
@@ -66,7 +66,7 @@ app.use(bodyParser.json());
 
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL,
   },
   transports: ['websocket', 'polling'],
 });

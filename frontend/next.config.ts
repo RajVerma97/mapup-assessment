@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/socket.io/:path*",
-        destination: "http://localhost:5001/socket.io/:path*",
+        destination: `${process.env.NEXT_PUBLIC_BACKEND}/socket.io/:path*`,
       },
     ];
   },
