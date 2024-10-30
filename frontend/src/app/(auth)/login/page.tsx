@@ -7,11 +7,7 @@ import { LoginAuthResponse, LoginUserData } from "@/types/login-user";
 import { AxiosError } from "axios";
 import { useState } from "react";
 
-interface LoginProps {
-  setPath: React.Dispatch<React.SetStateAction<string>>;
-}
-
-export default function Login({}: LoginProps) {
+export default function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
