@@ -8,20 +8,16 @@ interface MainContentProps {
   path: string;
   setPath: React.Dispatch<React.SetStateAction<string>>;
 }
-export default function MainContent({
-  className,
-  path,
-  setPath,
-}: MainContentProps) {
+export default function MainContent({ className, path }: MainContentProps) {
   const content = useMemo(() => {
     switch (path) {
       case "/dashboard":
         return <Dashboard />;
       case "/register":
-        return <Register setPath={setPath} />;
+        return <Register />;
       case "/login":
-        return <Login setPath={setPath} />;
+        return <Login />;
     }
-  }, [path, setPath]);
+  }, [path]);
   return <div className={` ${className}  `}>{content}</div>;
 }
