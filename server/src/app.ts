@@ -50,7 +50,7 @@ console.log('allowed origins', allowedOrigins);
 app.use(
   cors({
     origin: allowedOrigins,
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
   })
 );
