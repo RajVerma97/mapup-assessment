@@ -47,6 +47,7 @@ app.use(bodyParser.json());
 const port = process.env.PORT || 5001;
 
 const io = new Server(httpServer, {
+  path: '/socket.io/',
   cors: {
     origin: (
       origin: string | undefined,
@@ -59,7 +60,7 @@ const io = new Server(httpServer, {
       }
     },
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   },
   transports: ['websocket', 'polling'],
@@ -72,6 +73,9 @@ io.engine.on('connection_error', (err) => {
 createWorker(io);
 
 io.on('connection', (socket) => {
+  // eslint-disable-next-line no-console
+  console.log('client connected', socket.id);
+
   socket.on('fetchCloudCoverData', async () => {
     try {
       const cloudCoverData = await fetchCloudCoverMonthlyData();
@@ -195,8 +199,27 @@ app.post(
 
 app.use('/admin/queues', serverAdapter.getRouter());
 
-connectDb();
-
-httpServer.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
 });
+
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+  }
+);
+
+connectDb();
+httpServer
+  .listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  })
+  .on('error', (err) => {
+    console.error('Server error:', err);
+  });

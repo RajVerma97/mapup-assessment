@@ -101,7 +101,7 @@ export default function Dashboard() {
   };
 
   const [page] = useState(1);
-  const [limit] = useState(500);
+  const [limit] = useState(200);
   const [filter] = useState("");
   const [sort] = useState("asc");
 

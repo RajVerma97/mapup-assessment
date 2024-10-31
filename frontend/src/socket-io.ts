@@ -7,4 +7,8 @@ if (!process.env.NEXT_PUBLIC_BACKEND) {
 export const socket = io(`${process.env.NEXT_PUBLIC_BACKEND}`, {
   transports: ["websocket", "polling"],
   withCredentials: true,
+  path: "/socket.io/",
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
+  secure: true,
 });
