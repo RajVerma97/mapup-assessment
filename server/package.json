@@ -7,7 +7,7 @@
     "start": "node dist/app.js",
     "dev": "nodemon --watch src -e ts,json --exec \"tsx src/app.ts\"",
     "build:start": "rm -rf dist/ && tsc -p tsconfig.json && node -r dotenv/config dist/app.js",
-    "tsc": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
     "live": "live-server public",
     "lint": "eslint .",
     "lint:fix": "eslint .  --fix .",
