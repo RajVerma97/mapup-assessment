@@ -23,10 +23,18 @@ import fetchWeatherSeasonChart from './utils/fetch-weather-season-chart-data.js'
 import WeatherData from './api/models/weather.js';
 import verifyToken from './api/middleware/auth.js';
 import { WeatherDataParams } from './types/dashboard.js';
+import fs from 'fs';
 
 dotenv.config();
-
 const app = express();
+const path = 'uploads';
+
+if (!fs.existsSync(path)) {
+  fs.mkdirSync(path);
+}
+
+const upload = multer({ dest: path });
+
 const httpServer = http.createServer(app);
 
 const allowedOrigins: string[] = [
@@ -187,8 +195,6 @@ app.use('/user', userRoutes);
 
 const MONGODBURI = process.env.MONGODB_URI;
 
-const upload = multer({ dest: 'uploads/' });
-
 app.get('/', (req: Request, res: Response) => {
   res.render('index', { user: req.user });
 });
@@ -260,6 +266,7 @@ app.use(
 );
 
 connectDb();
+
 httpServer
   .listen(port, () => {
     console.log(`Server running on port ${port}`);
