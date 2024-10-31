@@ -52,13 +52,16 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-400 text-black">
-      <div className="bg-white  shadow-lg rounded-lg p-16 max-w-2xl  w-full">
-        <h1 className="text-center text-black text-3xl font-bold mb-8">
+    <div className="min-h-screen p-4 md:p-0  flex items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-400 text-black">
+      <div className="bg-white  shadow-lg rounded-lg  p-10 md:p-16 max-w-2xl  w-full">
+        <h1 className="text-center text-black text-3xl font-bold mb-10">
           Register
         </h1>
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-          <label htmlFor="email" className="font-medium">
+        <form
+          onSubmit={handleSubmit}
+          className="grid  gap-4"
+        >
+          <label htmlFor="email" className="text-lg">
             Email
           </label>
           <input
@@ -71,7 +74,7 @@ export default function Register() {
             required
           />
 
-          <label htmlFor="password" className="font-medium">
+          <label htmlFor="password" className="text-lg">
             Password
           </label>
           <input
@@ -84,7 +87,7 @@ export default function Register() {
             required
           />
 
-          <label htmlFor="username" className="font-medium">
+          <label htmlFor="username" className="text-lg">
             Username
           </label>
           <input
@@ -97,7 +100,7 @@ export default function Register() {
             required
           />
 
-          <label htmlFor="role" className="font-medium ">
+          <label htmlFor="role" className="text-lg">
             Role
           </label>
           <select

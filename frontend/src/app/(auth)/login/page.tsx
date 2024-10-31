@@ -45,8 +45,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-500 text-black">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+    <div className="min-h-screen p-6 md:p-0 flex items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-500 text-black">
+      <div className="bg-white shadow-lg rounded-lg p-12 md:p-8 max-w-md w-full">
         <h1 className="text-center text-3xl font-bold mb-6">Login</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label htmlFor="email" className="font-medium">

@@ -7,17 +7,22 @@ interface MainContentProps {
   className?: string;
   path: string;
   setPath: React.Dispatch<React.SetStateAction<string>>;
+  handleToggleSidebar: () => void;
 }
-export default function MainContent({ className, path }: MainContentProps) {
+export default function MainContent({
+  className,
+  path,
+  handleToggleSidebar,
+}: MainContentProps) {
   const content = useMemo(() => {
     switch (path) {
       case "/dashboard":
-        return <Dashboard />;
+        return <Dashboard handleToggleSidebar={handleToggleSidebar} />;
       case "/register":
         return <Register />;
       case "/login":
         return <Login />;
     }
-  }, [path]);
+  }, [path, handleToggleSidebar]);
   return <div className={` ${className}  `}>{content}</div>;
 }

@@ -1,6 +1,7 @@
 import {
   BarChart2,
   Droplet,
+  Menu,
   Pause,
   Thermometer,
   Upload,
@@ -32,6 +33,7 @@ import { TimeFrame } from "@/enums/dashboard";
 import MetricCard from "./MetricCard";
 import Loading from "./Loading";
 import SpinnerManager from "./SpinnerManager";
+import { useUser } from "@/app/hooks/use-user";
 
 const WeatherChart = dynamic(() => import("./WeatherChart"), {
   ssr: false,
@@ -68,7 +70,13 @@ interface ProgressResponse {
   progress: string;
 }
 
-export default function Dashboard() {
+interface DashboardProps {
+  handleToggleSidebar: () => void;
+}
+
+export default function Dashboard({ handleToggleSidebar }: DashboardProps) {
+  const user = useUser();
+
   const fileUploadMutation = useFileUploadMutation({
     onSuccess: (data: FileUploadAuthResponse) => {
       notify({
@@ -122,8 +130,8 @@ export default function Dashboard() {
 
   const [timeFrame] = useState<TimeFrame>(TimeFrame.YEARLY);
 
-  const [dateFrom, setDateFrom] = useState("2022-01-01");
-  const [dateTo, setDateTo] = useState("2022-01-09");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
 
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadingProgress, setUploadingProgress] = useState<number>(4);
@@ -257,30 +265,47 @@ export default function Dashboard() {
 
   return (
     <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
-      <div className="bg-white rounded-xl  p-6 md:p-8 shadow-lg flex  justify-between items-center">
-        <h1 className="text-xl md:text-3xl "> Dashboard</h1>
+      <div className="bg-white rounded-xl  p-8 shadow-lg flex  justify-between  items-center">
+        <h1
+          className={`
+  text-xl md:text-3xl
+  ${user ? "hidden md:block" : "block"}
+`}
+        >
+          Dashboard
+        </h1>
 
-        <label className="flex items-center   px-4 md:px-6 py-2 md:py-4 bg-blue-500  text-white rounded-lg hover:bg-blue-700 cursor-pointer">
-          {isUploading ? (
-            <div className="w-20 flex flex-col justify-between items-center">
-              <SpinnerManager isLoading={true} />
-              <p className="text-center text-md text-white">
-                {uploadingProgress}%
-              </p>
-            </div>
-          ) : (
-            <div className="w-32 flex  justify-between items-center">
-              <Upload size={30} color="white" />
-              <span>Upload CSV</span>
-              <input
-                type="file"
-                accept=".csv"
-                className="hidden"
-                onChange={handleUpload}
-              />
-            </div>
-          )}
-        </label>
+        <Menu
+          onClick={() => {
+            handleToggleSidebar();
+          }}
+          className="block md:hidden text-black "
+          size={30}
+        />
+
+        {user && (
+          <label className="flex items-center   px-4 md:px-6 py-2 md:py-4 bg-blue-500  text-white rounded-lg hover:bg-blue-700 cursor-pointer">
+            {isUploading ? (
+              <div className="w-20 flex flex-col justify-between items-center">
+                <SpinnerManager isLoading={true} />
+                <p className="text-center text-md text-white">
+                  {uploadingProgress}%
+                </p>
+              </div>
+            ) : (
+              <div className="w-32 flex  justify-between items-center">
+                <Upload size={30} color="white" />
+                <span>Upload CSV</span>
+                <input
+                  type="file"
+                  accept=".csv"
+                  className="hidden"
+                  onChange={handleUpload}
+                />
+              </div>
+            )}
+          </label>
+        )}
         {isUploading && (
           <button
             className="flex items-center justify-center p-2 border-2 text-black rounded-md hover:scale-105  transition duration-200 ease-in-out"
