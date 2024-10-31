@@ -1,6 +1,4 @@
 import express from 'express';
-import path from 'path';
-
 import { Request, Response } from 'express';
 import mongoose, { FilterQuery, Query } from 'mongoose';
 import dotenv from 'dotenv';
