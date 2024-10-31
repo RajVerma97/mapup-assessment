@@ -7,7 +7,7 @@ export interface User {
   _id: string;
   username: string;
   email: string;
-  role: string; // You can change this to UserRole if you want to enforce specific roles
+  role: string;
   __v: number;
 }
 
