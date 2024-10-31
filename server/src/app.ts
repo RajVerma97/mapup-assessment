@@ -35,10 +35,17 @@ const upload = multer({ dest: path });
 
 const httpServer = http.createServer(app);
 
-const allowedOrigins: string[] = [
-  process.env.FRONTEND_URL || '',
+if (!process.env.FRONTEND_URL) {
+  throw new Error('FRONTEND_URL variable is not defined');
+}
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
   'http://localhost:3000',
-].filter(Boolean) as string[];
+  'https://mapup-assessment-project.vercel.app/',
+];
+
+console.log('allowed origins', allowedOrigins);
 
 app.use(
   cors({
@@ -55,16 +62,7 @@ const port = process.env.PORT || 5001;
 const io = new Server(httpServer, {
   path: '/socket.io/',
   cors: {
-    origin: (
-      origin: string | undefined,
-      callback: (err: Error | null, success?: boolean) => void
-    ) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
