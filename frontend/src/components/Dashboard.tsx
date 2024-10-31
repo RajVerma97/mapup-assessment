@@ -260,7 +260,8 @@ export default function Dashboard({ handleToggleSidebar }: DashboardProps) {
   const handleCancelUpload = () => {
     setIsUploading(false);
     setUploadingProgress(0);
-    socket.emit("cancelUploadJob", jobId);
+    setJobId("");
+    // socket.emit("cancelUploadJob", jobId);
   };
 
   return (
