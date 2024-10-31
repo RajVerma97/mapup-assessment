@@ -192,7 +192,7 @@ app.use('/user', userRoutes);
 const MONGODBURI = process.env.MONGODB_URI;
 
 app.get('/', (req: Request, res: Response) => {
-  res.render('index');
+  res.render('index.ejs');
 });
 
 app.post(
