@@ -1,40 +1,81 @@
-import { configDotenv } from 'dotenv';
 import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
-if (process.env.NODE_ENV === 'production') {
-  dotenv.config({ path: '.env.prod' });
-} else {
-  dotenv.config({ path: '.env.local' });
-}
+const createRedisConnection = () => {
+  const redisHost = process.env.REDISHOST;
+  const redisPort = process.env.REDISPORT
+    ? parseInt(process.env.REDISPORT, 10)
+    : 6379;
+  const redisPassword = process.env.REDISPASSWORD;
 
-const redisHost = process.env.REDISHOST;
-const redisPort = process.env.REDISPORT
-  ? parseInt(process.env.REDISPORT, 10)
-  : 6379;
+  if (!redisHost) {
+    throw new Error('REDISHOST environment variable is not defined');
+  }
 
-const redisPassword =
-  process.env.NODE_ENV === 'production' ? process.env.REDISPASSWORD : undefined;
+  const redisOptions = {
+    host: redisHost,
+    port: redisPort,
+    password: redisPassword,
+    connectTimeout: 30000, 
+    maxRetriesPerRequest: null,
+    enableReadyCheck: true,
+    keepAlive: 30000,
+    retryStrategy: (times: number) => {
+      if (times > 3) {
+        console.error(`Redis retry attempt ${times} failed`);
+        return null; 
+      }
+      const delay = Math.min(times * 1000, 3000);
+      return delay;
+    },
+    reconnectOnError: (err: Error) => {
+      const targetError = 'READONLY';
+      if (err.message.includes(targetError)) {
+        return true;
+      }
+      return false;
+    },
+  };
 
-if (!redisHost) {
-  throw new Error('REDISHOST VARIABLE IS NOT DEFINED');
-}
+  try {
+    const redisConnection = new Redis(redisOptions);
 
-if (!redisPort) {
-  throw new Error('REDISPORT VARIABLE IS NOT DEFINED');
-}
+    
+    redisConnection.on('connect', () => {
+      console.log(
+        `Redis: Establishing connection to ${redisHost}:${redisPort}`
+      );
+    });
 
-const redisConnection = new Redis({
-  host: redisHost,
-  port: redisPort,
-  password: redisPassword,
-  maxRetriesPerRequest: null,
-});
+    redisConnection.on('ready', () => {
+      console.log('Redis: Connection established and ready');
+    });
 
-console.log(
-  `Connecting to Redis at ${redisHost}:${redisPort}` +
-    (redisPassword ? ' with password' : ' without password')
-);
+    redisConnection.on('error', (err) => {
+      console.error('Redis Error:', err);
+    });
 
-export default redisConnection;
+    redisConnection.on('close', () => {
+      console.log('Redis: Connection closed');
+    });
+
+    redisConnection.on('reconnecting', () => {
+      console.log('Redis: Attempting to reconnect...');
+    });
+
+    setInterval(() => {
+      redisConnection.ping().catch((err) => {
+        console.error('Redis ping failed:', err);
+      });
+    }, 10000);
+
+    return redisConnection;
+  } catch (error) {
+    console.error('Failed to create Redis connection:', error);
+    throw error;
+  }
+};
+
+export default createRedisConnection();

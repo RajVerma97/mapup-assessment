@@ -201,25 +201,46 @@ app.post(
   '/upload',
   upload.single('file'),
   async (req: Request, res: Response) => {
-    const filePath = req.file!.path;
+    if (!req.file) {
+      res.status(400).json({ message: 'No file uploaded' });
+      return;
+    }
+
+    const filePath = req.file.path;
 
     try {
-      const job = csvQueue.add(
+      const job = await csvQueue.add(
         'csv-job',
         { filePath },
         {
           attempts: 3,
           backoff: { type: 'fixed', delay: 10000 },
+          removeOnComplete: false,
         }
       );
-      console.log('job', job);
-      res.status(200).json({ message: 'File upload started!' });
+      console.log('after job creation');
+
+      console.log('Job created:', {
+        jobId: job.id,
+        filePath,
+        timestamp: new Date().toISOString(),
+      });
+
+      res.status(200).json({
+        message: 'File upload started!',
+        jobId: job.id,
+      });
+      return;
     } catch (error) {
-      res.status(500).json({ message: 'Error uploading file' });
+      console.error('Error creating job:', error);
+      res.status(500).json({
+        message: 'Error uploading file',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return;
     }
   }
 );
-
 app.use('/admin/queues', serverAdapter.getRouter());
 
 app.get('/health', (req, res) => {
