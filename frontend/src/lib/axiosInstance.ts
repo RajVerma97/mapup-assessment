@@ -2,6 +2,9 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND,
+  headers: {
+    "ACCESS-CONTROL-ALLOW-ORIGIN": "*",
+  },
 });
 
 axiosInstance.interceptors.request.use(

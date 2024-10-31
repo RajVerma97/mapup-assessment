@@ -17,5 +17,6 @@ declare global {
 }
 
 router.post('/login', upload.none(), loginUser);
+router.post('/register', upload.none(), registerUser);
 
 export default router;

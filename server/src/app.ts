@@ -39,11 +39,7 @@ if (!process.env.FRONTEND_URL) {
   throw new Error('FRONTEND_URL variable is not defined');
 }
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:3000',
-  'https://mapup-assessment-project.vercel.app/',
-];
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000'];
 
 console.log('allowed origins', allowedOrigins);
 
@@ -63,7 +59,7 @@ const io = new Server(httpServer, {
   path: '/socket.io/',
   cors: {
     origin: allowedOrigins,
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   },
