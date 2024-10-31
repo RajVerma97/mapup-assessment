@@ -192,11 +192,7 @@ app.use('/user', userRoutes);
 const MONGODBURI = process.env.MONGODB_URI;
 
 app.get('/', (req: Request, res: Response) => {
-  res.render('index', { user: req.user });
-});
-
-app.get('/protected', verifyToken, (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Protected route Accessed  Successfully' });
+  res.render('index');
 });
 
 app.post(
@@ -257,11 +253,18 @@ app.use(
     next: express.NextFunction
   ) => {
     console.error(err.stack);
-    res.status(500).send('Something broke!');
+    res
+      .status(500)
+      .json({ message: 'Internal Server Error', error: err.message });
   }
 );
 
 connectDb();
+
+app.options('/user/login', (req, res) => {
+  console.log('Received OPTIONS request for /user/login');
+  res.send(); // Send a response for the preflight check
+});
 
 httpServer
   .listen(port, () => {
