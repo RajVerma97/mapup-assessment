@@ -118,6 +118,7 @@ export default function Dashboard() {
   const [weatherSeasonData, setWeatherSeasonData] = useState<
     WeatherSeasonData[]
   >([]);
+  const [jobId, setJobId] = useState<string>("");
 
   const [timeFrame] = useState<TimeFrame>(TimeFrame.YEARLY);
 
@@ -153,7 +154,7 @@ export default function Dashboard() {
           socket?.emit("fetchWeatherSeasonChartData");
         } catch (error) {
           // eslint-disable-next-line no-console
-          console.error("Error fetching data:", error);
+          console.log("Error fetching data:", error);
         }
       }
     };
@@ -179,7 +180,22 @@ export default function Dashboard() {
     });
     socket.on("job:completed", () => {});
     socket.on("progress", (data: ProgressResponse) => {
+      setJobId(data.jobId);
       setUploadingProgress(parseInt(data.progress));
+    });
+
+    socket.on("jobCancelled", () => {
+      notify({
+        message: "Upload cancelled successfully",
+        status: "success",
+      });
+    });
+
+    socket.on("jobCancelledFailed", (error: Error) => {
+      notify({
+        message: "Upload failed to cancel " + error.message,
+        status: "error",
+      });
     });
 
     fetchData();
@@ -191,6 +207,8 @@ export default function Dashboard() {
       socket.off("monthlyTemperatureData");
       socket.off("monthlyHumidityData");
       socket.off("weatherSeasonChartData");
+      socket.off("jobCancelled");
+      socket.off("jobCancelledFailed");
     };
   }, [
     page,
@@ -202,6 +220,7 @@ export default function Dashboard() {
     filter,
     sort,
     uploadingProgress,
+    jobId,
   ]);
 
   const weatherChartData: WeatherChartData[] = weatherData?.map(
@@ -233,6 +252,7 @@ export default function Dashboard() {
   const handleCancelUpload = () => {
     setIsUploading(false);
     setUploadingProgress(0);
+    socket.emit("cancelUploadJob", jobId);
   };
 
   return (

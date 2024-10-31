@@ -162,6 +162,22 @@ io.on('connection', (socket) => {
       });
     }
   });
+
+  socket.on('cancelUploadJob', async (jobId) => {
+    try {
+      const job = await csvQueue.getJob(jobId);
+
+      if (!job) {
+        throw new Error('Job not found with id ' + jobId);
+      }
+
+      await job.remove();
+
+      socket.emit('jobCancelled', jobId);
+    } catch (error) {
+      socket.emit('jobCancelledFailed', error);
+    }
+  });
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
@@ -188,7 +204,14 @@ app.post(
     const filePath = req.file!.path;
 
     try {
-      const job = csvQueue.add('csv-job', { filePath });
+      const job = csvQueue.add(
+        'csv-job',
+        { filePath },
+        {
+          attempts: 3,
+          backoff: { type: 'fixed', delay: 10000 },
+        }
+      );
       console.log('job', job);
       res.status(200).json({ message: 'File upload started!' });
     } catch (error) {

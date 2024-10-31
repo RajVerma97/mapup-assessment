@@ -3,8 +3,10 @@ import { Worker, Job } from 'bullmq';
 import csvParser from 'csv-parser';
 import fs from 'fs';
 import redisConnection from '../queues/redis.js';
+import { csvQueue } from '../queues/queue.js';
 
 let skipRows = 4;
+
 export function createWorker(io: any) {
   const worker = new Worker(
     'csv-processing',
@@ -15,72 +17,93 @@ export function createWorker(io: any) {
       let processedRows = 0;
       let savedRows = 0;
 
-      fs.createReadStream(filePath)
-        .pipe(
-          csvParser({
-            skipLines: skipRows,
-            headers: true,
-          })
-        )
-        .on('data', (data) => {
-          results.push(data);
-          processedRows += 1;
-
-          const parsingProgress = Math.min(
-            (processedRows / totalRows) * 100,
-            99
-          ).toFixed(2);
-          io.emit('progress', { jobId: job.id, progress: parsingProgress });
+      const stream = fs.createReadStream(filePath).pipe(
+        csvParser({
+          skipLines: skipRows,
+          headers: true,
         })
-        .on('end', async () => {
-          try {
-            for (const item of results) {
-              const weatherData = {
-                time: item._0,
-                temperature_2m: item._1,
-                dew_point_2m: item._2,
-                precipitation: item._3,
-                rain: item._4,
-                snowfall: item._5,
-                snow_depth: item._6,
-                weather_code: item._7,
-                pressure_msl: item._8,
-                surface_pressure: item._9,
-                cloud_cover_low: item._10,
-                cloud_cover_mid: item._11,
-                cloud_cover_high: item._12,
-                wind_speed_100m: item._13,
-                wind_direction_100m: item._14,
-                soil_temperature_7_to_28cm: item._15,
-                soil_moisture_7_to_28cm: item._16,
-              };
+      );
 
-              const mongoDocument = new WeatherData(weatherData);
-              await mongoDocument.save();
-              console.log('saving doc to mongo successfully ' + savedRows);
-              savedRows += 1;
+      stream.on('data', async (data) => {
+        const currentJob = await csvQueue.getJob(job.id!);
+        console.log(currentJob?.data);
+        if (!currentJob) {
+          console.log('Job was cancelled. before processing.');
+          stream.destroy();
+          return;
+        }
 
-              const saveProgress = Math.min(
-                (savedRows / totalRows) * 100,
-                100
-              ).toFixed(2);
-              io.emit('progress', { jobId: job.id, progress: saveProgress });
+        results.push(data);
+        processedRows += 1;
+
+        const parsingProgress = Math.min(
+          (processedRows / totalRows) * 100,
+          99
+        ).toFixed(2);
+        io.emit('progress', { jobId: job.id, progress: parsingProgress });
+      });
+
+      stream.on('end', async () => {
+        try {
+          for (const item of results) {
+            const currentJob = await csvQueue.getJob(job.id!);
+            if (!currentJob) {
+              console.log(
+                'Job was cancelled. before inserting data in mongodb.'
+              );
+              stream.destroy();
+              return;
             }
 
-            io.emit('progress', { jobId: job.id, progress: '100' });
-          } catch (error: unknown) {
-            if (error instanceof Error) {
-              console.error(`Error saving data to MongoDB: ${error.message}`);
-            } else {
-              console.error('Error saving data to MongoDB: Unknown error');
-            }
+            const weatherData = {
+              time: item._0,
+              temperature_2m: item._1,
+              dew_point_2m: item._2,
+              precipitation: item._3,
+              rain: item._4,
+              snowfall: item._5,
+              snow_depth: item._6,
+              weather_code: item._7,
+              pressure_msl: item._8,
+              surface_pressure: item._9,
+              cloud_cover_low: item._10,
+              cloud_cover_mid: item._11,
+              cloud_cover_high: item._12,
+              wind_speed_100m: item._13,
+              wind_direction_100m: item._14,
+              soil_temperature_7_to_28cm: item._15,
+              soil_moisture_7_to_28cm: item._16,
+            };
+
+            const mongoDocument = new WeatherData(weatherData);
+            await mongoDocument.save();
+            console.log('saved mongo document ' + savedRows);
+            savedRows += 1;
+
+            const saveProgress = Math.min(
+              (savedRows / totalRows) * 100,
+              100
+            ).toFixed(2);
+            io.emit('progress', { jobId: job.id, progress: saveProgress });
           }
-        })
-        .on('error', (error) => {
-          console.error(`Error reading CSV file: ${error.message}`);
-        });
+
+          io.emit('progress', { jobId: job.id, progress: '100' });
+        } catch (error) {
+          console.error(
+            `Error saving data to MongoDB: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
+        }
+      });
+
+      stream.on('error', (error) => {
+        console.error(`Error reading CSV file: ${error.message}`);
+      });
     },
-    { connection: redisConnection }
+    {
+      connection: redisConnection,
+      stalledInterval: 60000, // Time interval in ms for stalled jobs (60 seconds)
+      maxStalledCount: 5,
+    }
   );
 
   worker.on('failed', (job: Job | undefined, err: Error) => {
@@ -93,6 +116,7 @@ export function createWorker(io: any) {
 
   return worker;
 }
+
 function countCSVRows(filePath: string): Promise<number> {
   return new Promise((resolve, reject) => {
     let rowCount = 0;
