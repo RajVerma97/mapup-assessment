@@ -23,7 +23,7 @@ const AvgHumidityChart = ({ data }: AvgHumidityChartProps) => {
       <BarChart
         data={data}
         width={isMobile ? 250 : 350}
-        height={isMobile ? 200 : 400}
+        height={isMobile ? 300 : 400}
         margin={{ top: 20 }}
       >
         <CartesianGrid strokeDasharray="3 3" />

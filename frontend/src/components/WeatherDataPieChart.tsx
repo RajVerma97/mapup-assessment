@@ -9,6 +9,7 @@ import {
 } from "chart.js";
 import { PolarArea } from "react-chartjs-2";
 import { DailyWeatherData } from "@/types/dashboard";
+import { useMediaQuery } from "react-responsive";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, RadialLinearScale);
 
@@ -36,8 +37,16 @@ export default function DailyWeatherChart({ data }: DailyWeatherChartProps) {
     })),
   };
 
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+
   return (
-    <div style={{ width: "60%", height: "100%", margin: "0 auto" }}>
+    <div
+      style={{
+        width: isMobile ? "100%" : "50%",
+        height: "100%",
+        margin: "0 auto",
+      }}
+    >
       <PolarArea data={chartData} />
     </div>
   );

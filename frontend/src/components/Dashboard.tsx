@@ -265,7 +265,7 @@ export default function Dashboard({ handleToggleSidebar }: DashboardProps) {
   };
 
   return (
-    <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black p-8 space-y-4">
+    <div className=" bg-gradient-to-r from-purple-400 to-indigo-400 text-black  p-6 md:p-10 grid  gap-5 md:gap-6">
       <div className="bg-white rounded-xl  p-8 shadow-lg flex  justify-between  items-center">
         <h1
           className={`
@@ -343,9 +343,9 @@ export default function Dashboard({ handleToggleSidebar }: DashboardProps) {
           color="#8E44AD"
         />
       </div>
-      <div className="bg-white p-6 rounded-xl shadow-lg ">
-        <h1 className="text-3xl  "> Filters</h1>
-        <div className="flex mt-2  flex-col md:flex-row gap-4">
+      <div className="bg-white p-8 rounded-xl shadow-lg ">
+        <h1 className="text-3xl   "> Filters</h1>
+        <div className="flex mt-4  flex-col md:flex-row gap-4">
           <div className="flex flex-col">
             <label className="text-sm text-gray-500">From</label>
             <input
@@ -368,27 +368,27 @@ export default function Dashboard({ handleToggleSidebar }: DashboardProps) {
         </div>
       </div>
 
-      <div className=" w-full   bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
+      <div className=" w-full   bg-white rounded-xl shadow-lg center  p-4 md:p-12  flex justify-center text-center overflow-hidden  ">
         {isWeatherDataLoading ? (
           <Loading isLoading={isWeatherDataLoading} />
         ) : (
           <WeatherChart data={weatherChartData} />
         )}
       </div>
-      <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-center text-center overflow-hidden  ">
+      <div className=" w-full  bg-white rounded-xl shadow-lg center  p-4 md:p-12  flex justify-center text-center overflow-hidden  ">
         <CloudCoverWeatherChart data={cloudCoverData} />
       </div>
-      <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex flex-col md:flex-row  justify-between items-center gap-4 text-center overflow-hidden  ">
+      <div className=" w-full  bg-white rounded-xl shadow-lg center  p-4 md:p-12  flex flex-col md:flex-row  justify-between items-center gap-6 text-center overflow-hidden  ">
         <MonthlyAverageTemperatureChart data={monthlyTemperatureData} />
         <AvgHumidityChart data={monthlyHumidityData} />
       </div>
-      <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-between items-center gap-4 text-center overflow-hidden  ">
+      <div className=" w-full  bg-white rounded-xl shadow-lg center  p-4 md:p-12  flex justify-between items-center gap-4 text-center overflow-hidden  ">
         <WindSpeedDirectionChart data={windSpeedData} />
       </div>
-      <div className=" w-full  bg-white rounded-xl shadow-lg p-12 flex justify-between items-center gap-4 text-center overflow-hidden  ">
+      <div className=" w-full  bg-white rounded-xl shadow-lg center  p-4 md:p-12 flex justify-between items-center gap-4 text-center overflow-hidden  ">
         <WeatherSeasonChart data={weatherSeasonData} />
       </div>
-      <div className=" w-full  bg-white rounded-xl shadow-lg p-12  flex justify-between items-center gap-4 text-center overflow-hidden  ">
+      <div className=" w-full  bg-white rounded-xl shadow-lg center  p-4 md:p-12  flex justify-between items-center gap-4 text-center overflow-hidden  ">
         <DailyWeatherChart data={dailyWeatherData} />
       </div>
 

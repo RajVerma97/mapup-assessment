@@ -78,11 +78,16 @@ const WeatherChart = ({ data }: WeatherChartProps) => {
   };
 
   return (
-    <div className="w-full h-[400px] p-6 bg-white rounded-xl shadow-sm">
+    <div
+      className="w-full h-[400px]  bg-white rounded-xl shadow-sm  "
+      style={{
+        margin: "0 auto",
+      }}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          width={isMobile ? 400 : 700}
-          height={isMobile ? 200 : 350}
+          width={isMobile ? 300 : 650}
+          height={isMobile ? 300 : 350}
           data={data}
           margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
         >

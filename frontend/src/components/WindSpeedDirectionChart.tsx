@@ -9,6 +9,7 @@ import {
   Legend,
 } from "chart.js";
 import { WindSpeedDirectionData } from "@/types/dashboard";
+import { useMediaQuery } from "react-responsive";
 
 ChartJS.register(LinearScale, PointElement, Title, Tooltip, Legend);
 
@@ -72,5 +73,22 @@ export default function WindSpeedDirectionChart({
     },
   };
 
-  return <Scatter data={chartData} options={options} />;
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "300px",
+        margin: "0 auto",
+      }}
+    >
+      <Scatter
+        width={isMobile ? "100%" : "250%"}
+        height="100%"
+        data={chartData}
+        options={options}
+      />
+    </div>
+  );
 }
