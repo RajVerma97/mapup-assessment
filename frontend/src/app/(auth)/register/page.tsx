@@ -52,16 +52,13 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-0  flex items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-400 text-black">
-      <div className="bg-white  shadow-lg rounded-lg  p-10 md:p-16 max-w-2xl  w-full">
+    <div className="h-full  p-3 pb-5 sm:p-2 sm:pb-4  md:p-0  flex items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-400 text-black ">
+      <div className="bg-white  shadow-lg rounded-lg  p-4 sm:p-8 md:p-16 max-w-2xl  w-full">
         <h1 className="text-center text-black text-3xl font-bold mb-10">
           Register
         </h1>
-        <form
-          onSubmit={handleSubmit}
-          className="grid  gap-4"
-        >
-          <label htmlFor="email" className="text-lg">
+        <form onSubmit={handleSubmit} className="grid   gap-2 sm:gap-4">
+          <label htmlFor="email" className=" text-lg">
             Email
           </label>
           <input
@@ -117,7 +114,7 @@ export default function Register() {
 
           <button
             type="submit"
-            className="bg-black col-span-2 h-full   text-white rounded-lg  hover:bg-blue-600 transition duration-200 mt-6"
+            className="bg-black col-span-2 h-full py-2   text-white rounded-lg  hover:bg-blue-600 transition duration-200  "
           >
             Submit
           </button>
